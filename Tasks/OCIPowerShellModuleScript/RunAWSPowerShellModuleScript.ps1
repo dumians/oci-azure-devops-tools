@@ -1,0 +1,376 @@
+##########################################################################
+# Copyright 2017 Oracle.com, Inc. and its affiliates. All Rights Reserved.
+#
+# Licensed under the MIT License. See the LICENSE accompanying this file
+# for the specific language governing permissions and limitations under
+# the License.
+##########################################################################
+
+[CmdletBinding()]
+param()
+
+Trace-VstsEnteringInvocation $MyInvocation
+Import-VstsLocStrings "$PSScriptRoot\task.json"
+
+# Adapting code from the VSTS-Tasks 'PowerShell' task to install (if needed)
+# and set up the executing context for OCI, then handing the user script
+# off to PowerShell for execution
+try
+{
+    # suppress any progress bars to attempt to speed things up
+    $ProgressPreference = 'SilentlyContinue'
+
+    # Agent.TempDirectory was added in agent version 2.115.0, which may not
+    # be available in 2015 installs of TFS, so probe for and fallback to
+    # another temp location variable if necessary. This allows us to set
+    # minimunm agent version that's compatible with TFS 2015 editions
+    # preventing an issue causing our tasks to not be listed after install
+    # if a higher agent version is specified.
+    $tempDirectory = Get-VstsTaskVariable -Name 'agent.tempDirectory'
+    if (!$tempDirectory)
+    {
+        Write-Host 'Agent.TempDirectory not available, falling back to user temp location'
+        $tempDirectory = $env:TEMP
+    }
+
+    Assert-VstsPath -LiteralPath $tempDirectory -PathType 'Container'
+
+    # install the module if not present (we assume if present it is an an autoload-capable
+    # location)
+    Write-Host (Get-VstsLocString -Key 'TestingOCIModuleInstalled')
+    if (!(Get-Module -Name OCIPowerShell -ListAvailable))
+    {
+        Write-Host (Get-VstsLocString -Key 'OCIModuleNotFound')
+
+        # AllowClobber is not available in Install-Module in the Hosted agent (but is in the
+        # Hosted 2017 agent). We always install/update the latest NuGet package
+        # provider to work around Install-Module on the Hosted agent also not having -Force and
+        # producing the error
+        #
+        # 'Exception calling “ShouldContinue” with “2” argument(s): “Windows PowerShell is in NonInteractive mode.'
+        #
+        Write-Host (Get-VstsLocString -Key 'InstallingOCIModule')
+        Install-PackageProvider -Name NuGet -Scope CurrentUser -Verbose -Force
+        $installModuleCmd = Get-Command Install-Module
+        if ($installModuleCmd.Parameters.ContainsKey("AllowClobber"))
+        {
+            Install-Module -Name OCIPowerShell -Scope CurrentUser -Verbose -AllowClobber -Force
+        }
+        else
+        {
+            Install-Module -Name OCIPowerShell -Scope CurrentUser -Verbose -Force
+        }
+    }
+
+    Import-Module -Name OCIPowerShell
+
+    ###############################################################################
+    # If credentials and/or region are not defined on the task we assume them to be
+    # already set in the host environment or, if on EC2, to be in instance metadata.
+    # We prefer to use environment variables to pass credentials, to avoid leaving
+    # any profiles around when the build completes and any contention from parallel
+    # or multi-user build setups.
+    ###############################################################################
+
+    # determine region first in case we need to perform an assume role call
+    # when we get credentials
+    $OCIRegion = Get-VstsInput -Name 'regionName'
+    if ($OCIRegion)
+    {
+        Write-Host (Get-VstsLocString -Key 'ConfiguringRegionFromTaskConfiguration')
+    }
+    else
+    {
+        # as for credentials, region can also be set from a task variable
+        $OCIRegion = Get-VstsTaskVariable -Name 'OCI.Region'
+        if ($OCIRegion)
+        {
+            Write-Host (Get-VstsLocString -Key 'ConfiguringRegionFromTaskVariable')
+        }
+    }
+
+    if ($OCIRegion)
+    {
+        Write-Host (Get-VstsLocString -Key 'RegionConfiguredTo' -ArgumentList $OCIRegion)
+        $env:OCI_REGION = $OCIRegion
+    }
+
+    $OCIEndpoint = Get-VstsInput -Name 'OCICredentials'
+    if ($OCIEndpoint)
+    {
+        $OCIEndpointAuth = Get-VstsEndpoint -Name $OCIEndpoint -Require
+        if ($OCIEndpointAuth.Auth.Parameters.AssumeRoleArn)
+        {
+            Write-Host (Get-VstsLocString -Key 'ConfiguringForRoleCredentials')
+            $assumeRoleParameters = @{
+                'AccessKey' = $OCIEndpointAuth.Auth.Parameters.UserName
+                'SecretKey' = $OCIEndpointAuth.Auth.Parameters.Password
+                'RoleArn' = $OCIEndpointAuth.Auth.Parameters.AssumeRoleArn
+            }
+            if ($OCIEndpointAuth.Auth.Parameters.RoleSessionName)
+            {
+                $assumeRoleParameters.Add('RoleSessionName', $OCIEndpointAuth.Auth.Parameters.RoleSessionName)
+            }
+            else
+            {
+                $assumeRoleParameters.Add('RoleSessionName', 'OCI-vsts-tools')
+            }
+            if ($OCIEndpointAuth.Auth.Parameters.ExternalId)
+            {
+                $assumeRoleParameters.Add('ExternalId', $OCIEndpointAuth.Auth.Parameters.ExternalId)
+            }
+
+            $assumeRoleResponse = Use-STSRole @assumeRoleParameters
+
+            $env:OCI_ACCESS_KEY_ID = $assumeRoleResponse.Credentials.AccessKeyId
+            $env:OCI_SECRET_ACCESS_KEY = $assumeRoleResponse.Credentials.SecretAccessKey
+            $env:OCI_SESSION_TOKEN = $assumeRoleResponse.Credentials.SessionToken
+        }
+        else
+        {
+            Write-Host (Get-VstsLocString -Key 'ConfiguringForStandardCredentials')
+            $env:OCI_ACCESS_KEY_ID = $OCIEndpointAuth.Auth.Parameters.UserName
+            $env:OCI_SECRET_ACCESS_KEY = $OCIEndpointAuth.Auth.Parameters.Password
+        }
+    }
+    else
+    {
+        # credentials may also be set in task variables, so try there before
+        # assuming they are set in the process environment
+        $accessKey = Get-VstsTaskVariable -Name 'OCI.AccessKeyID'
+        if ($accessKey)
+        {
+            $secretKey = Get-VstsTaskVariable -Name 'OCI.SecretAccessKey'
+            if (!($secretKey))
+            {
+                throw (Get-VstsLocString -Key 'MissingSecretKeyVariable')
+            }
+
+            Write-Host (Get-VstsLocString -Key 'ConfiguringForTaskVariableCredentials')
+            $env:OCI_ACCESS_KEY_ID = $accessKey
+            $env:OCI_SECRET_ACCESS_KEY = $secretKey
+
+            $token = Get-VstsTaskVariable -Name 'OCI.SessionToken'
+            if ($token)
+            {
+                $env:OCI_SESSION_TOKEN = $token
+            }
+        }
+    }
+
+    # Was not able to get the Get-VstsWebProxy helper to work, plus it has a
+    # minimum agent version of 2.105.8 so instead we attempt to read the Agent.Proxy*
+    # variables directly
+    $agentProxyUrl = Get-VstsTaskVariable -Name 'Agent.ProxyUrl'
+    $agentProxyUserName = Get-VstsTaskVariable -Name 'Agent.ProxyUsername';
+    $agentProxyPassword = Get-VstsTaskVariable -Name 'Agent.ProxyPassword';
+
+    # poke metrics tag into the environment
+    Set-Item -Path env:OCI_EXECUTION_ENV -Value 'VSTS-OCIPowerShellModuleScript'
+
+    $scriptType = Get-VstsInput -Name 'scriptType' -Require
+    $input_errorActionPreference = Get-VstsInput -Name 'errorActionPreference' -Default 'Stop'
+    switch ($input_errorActionPreference.ToUpperInvariant())
+    {
+        'STOP' { }
+        'CONTINUE' { }
+        'SILENTLYCONTINUE' { }
+        default
+        {
+            Write-Error (Get-VstsLocString -Key 'PS_InvalidErrorActionPreference' -ArgumentList $input_errorActionPreference)
+        }
+    }
+
+    $input_failOnStderr = Get-VstsInput -Name 'failOnStderr' -AsBool
+    $input_ignoreLASTEXITCODE = Get-VstsInput -Name 'ignoreLASTEXITCODE' -AsBool
+    $input_workingDirectory = Get-VstsInput -Name 'workingDirectory' -Require
+    Assert-VstsPath -LiteralPath $input_workingDirectory -PathType 'Container'
+
+    $scriptType = Get-VstsInput -Name 'scriptType' -Require
+    $input_arguments = Get-VstsInput -Name 'arguments'
+
+    if ("$scriptType".ToUpperInvariant() -eq "FILEPATH")
+    {
+        $input_filePath = Get-VstsInput -Name 'filePath' -Require
+        try
+        {
+            Assert-VstsPath -LiteralPath $input_filePath -PathType Leaf
+        }
+        catch
+        {
+            Write-Error (Get-VstsLocString -Key 'PS_InvalidFilePath' -ArgumentList $input_filePath)
+        }
+
+        if (!$input_filePath.ToUpperInvariant().EndsWith('.PS1'))
+        {
+            Write-Error (Get-VstsLocString -Key 'PS_InvalidFilePath' -ArgumentList $input_filePath)
+        }
+    }
+    else
+    {
+        $input_script = Get-VstsInput -Name 'inlineScript' -Require
+        # Construct a name to a temp file that will hold the inline script, so
+        # we can pass arguments to it. We will delete this file on exit from
+        # the task.
+        $input_filePath = [System.IO.Path]::Combine($tempDirectory, "$([System.Guid]::NewGuid()).ps1")
+    }
+
+    # Generate the script contents
+    Write-Host (Get-VstsLocString -Key 'GeneratingScript')
+    $contents = @()
+    $contents += "`$ErrorActionPreference = '$input_errorActionPreference'"
+
+    if ($agentProxyUrl)
+    {
+        $proxyUri = [Uri]$agentProxyUrl
+
+        $proxyCommand = "Set-OCIProxy"
+        $proxyCommand += " -Hostname $($proxyUri.Host)"
+        $proxyCommand += " -Port $($proxyUri.Port)"
+
+        if ($agentProxyUserName)
+        {
+            $proxyCommand += " -Username $agentProxyUserName"
+        }
+        if ($agentProxyPassword)
+        {
+            $proxyCommand += " -Password $agentProxyPassword"
+        }
+
+        Write-Host "Configuring script for proxy at $($proxyUri.Scheme)://$($proxyUri.Host):$($proxyUri.Port)"
+
+        $contents += $proxyCommand
+    }
+
+    # By writing an inline script to a file, and then dot sourcing that from
+    # the outer script we construct (ie behaving as if the user had chosen
+    # filepath mode) we gain the ability to pass arguments to both modes.
+    # We don't need to clean this file up on exit.
+    if ("$scriptType".ToUpperInvariant() -eq 'INLINE')
+    {
+        $userScript += "$input_script".Replace("`r`n", "`n").Replace("`n", "`r`n")
+        $joinedContents = [System.String]::Join(([System.Environment]::NewLine), $userScript)
+        Write-Host "Writing inline script to temporary file $input_filePath"
+        $null = [System.IO.File]::WriteAllText($input_filePath, $joinedContents, ([System.Text.Encoding]::UTF8))
+    }
+
+    $contents += ". '$("$input_filePath".Replace("'", "''"))' $input_arguments".Trim()
+
+    Write-Host (Get-VstsLocString -Key 'PS_FormattedCommand' -ArgumentList ($contents[-1]))
+
+    if (!$input_ignoreLASTEXITCODE)
+    {
+        $contents += 'if (!(Test-Path -LiteralPath variable:\LASTEXITCODE)) {'
+        $contents += '    Write-Host ''##vso[task.debug]$LASTEXITCODE is not set.'''
+        $contents += '} else {'
+        $contents += '    Write-Host (''##vso[task.debug]$LASTEXITCODE: {0}'' -f $LASTEXITCODE)'
+        $contents += '    exit $LASTEXITCODE'
+        $contents += '}'
+    }
+
+    # Write the outer script dot-sourcing the user script which is now temporarily stored
+    # in another script file (if it was provided inline) or in the original file the user
+    # configured the task with
+    $filePath = [System.IO.Path]::Combine($tempDirectory, "$([System.Guid]::NewGuid()).ps1")
+    $joinedContents = [System.String]::Join(([System.Environment]::NewLine), $contents)
+    Write-Host "Writing temporary wrapper script for invoking user script to $filePath"
+    $null = [System.IO.File]::WriteAllText($filePath, $joinedContents, ([System.Text.Encoding]::UTF8))
+
+    # Prepare the external command values.
+    $powershellPath = Get-Command -Name powershell.exe -CommandType Application | Select-Object -First 1 -ExpandProperty Path
+    Assert-VstsPath -LiteralPath $powershellPath -PathType 'Leaf'
+    $arguments = "-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -File `"$filePath`""
+    $splat = @{
+        'FileName' = $powershellPath
+        'Arguments' = $arguments
+        'WorkingDirectory' = $input_workingDirectory
+    }
+
+    # Switch to "Continue".
+    $global:ErrorActionPreference = 'Continue'
+    $failed = $false
+
+    # Run the script.
+    if (!$input_failOnStderr)
+    {
+        Invoke-VstsTool @splat
+    }
+    else
+    {
+        $inError = $false
+        $errorLines = New-Object System.Text.StringBuilder
+        Invoke-VstsTool @splat 2>&1 |
+            ForEach-Object {
+                if ($_ -is [System.Management.Automation.ErrorRecord])
+                {
+                    # Buffer the error lines.
+                    $failed = $true
+                    $inError = $true
+                    $null = $errorLines.AppendLine("$($_.Exception.Message)")
+
+                    # Write to verbose to mitigate if the process hangs.
+                    Write-Verbose "STDERR: $($_.Exception.Message)"
+                }
+                else
+                {
+                    # Flush the error buffer.
+                    if ($inError)
+                    {
+                        $inError = $false
+                        $message = $errorLines.ToString().Trim()
+                        $null = $errorLines.Clear()
+                        if ($message)
+                        {
+                            Write-VstsTaskError -Message $message
+                        }
+                    }
+
+                    Write-Host "$_"
+                }
+            }
+
+        # Flush the error buffer one last time.
+        if ($inError)
+        {
+            $inError = $false
+            $message = $errorLines.ToString().Trim()
+            $null = $errorLines.Clear()
+            if ($message)
+            {
+                Write-VstsTaskError -Message $message
+            }
+        }
+    }
+
+    # Fail on $LASTEXITCODE
+    if (!(Test-Path -LiteralPath 'variable:\LASTEXITCODE'))
+    {
+        $failed = $true
+        Write-Verbose "Unable to determine exit code"
+        Write-VstsTaskError -Message (Get-VstsLocString -Key 'PS_UnableToDetermineExitCode')
+    }
+    else
+    {
+        if ($LASTEXITCODE -ne 0)
+        {
+            $failed = $true
+            Write-VstsTaskError -Message (Get-VstsLocString -Key 'PS_ExitCode' -ArgumentList $LASTEXITCODE)
+        }
+    }
+
+    # Fail if any errors.
+    if ($failed)
+    {
+        Write-VstsSetResult -Result 'Failed' -Message "Error detected" -DoNotThrow
+    }
+}
+finally
+{
+    if ($scriptType -And "$scriptType".ToUpperInvariant() -eq "INLINE")
+    {
+        Write-Host "Cleaning up temporary script file $input_filePath"
+        Remove-Item -Path $input_filePath -Force
+    }
+
+    Trace-VstsLeavingInvocation $MyInvocation
+}

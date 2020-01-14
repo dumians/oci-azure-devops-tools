@@ -1,0 +1,11 @@
+{
+    "name": "OCIcli",
+    "version": "1.1.8",
+    "description": "Run a Shell or Batch script with OCI CLI commands against an OCI connection",
+    "main": "OCICLI.js",
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "sdkutils": "file:../../_build/Tasks/Common/sdkutils"
+    }
+}

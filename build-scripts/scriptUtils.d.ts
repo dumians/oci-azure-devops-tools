@@ -1,0 +1,16 @@
+/*!
+ * Copyright 2019 Oracle.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: MIT
+ */
+
+declare module scriptUtils {
+    const repoRoot: string
+    const sourceTasks: string
+    const buildRoot: string
+    const buildTasks: string
+    const packageRoot: string
+    const packageTask: string
+    const releaseVersion: string
+}
+
+export = scriptUtils

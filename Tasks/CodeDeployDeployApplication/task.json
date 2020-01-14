@@ -1,0 +1,216 @@
+{
+    "id": "2ff35748-7800-409d-9511-a0a37ff0d348",
+    "name": "CodeDeployDeployApplication",
+    "friendlyName": "OCI CodeDeploy Application Deployment",
+    "description": "Deploys an application to Oracle EC2 instance(s) using OCI CodeDeploy",
+    "author": "Oracle Web Services",
+    "helpMarkDown": "Please refer to [OCI CodeDeploy User Guide](https://docs.OCI.Oracle.com/codedeploy/latest/userguide/) for more information on working with OCI CodeDeploy.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/codedeploy-deployment.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* codedeploy:GetApplication\n* codedeploy:GetDeploymentGroup\n* codedeploy:CreateDeployment\n* codedeploy:GetDeployment\n\nDepending on selected parameters the task may also require permissions to verify your deployment bundle exists in S3 or upload your application bundle to the specified Oracle S3 bucket. Depending on the size of the application bundle, either PutObject or the S3 multi-part upload APIs may be used.",
+    "category": "Deploy",
+    "visibility": ["Build", "Release"],
+    "demands": [],
+    "minimumAgentVersion": "1.91.0",
+    "instanceNameFormat": "Deploy with CodeDeploy: $(applicationName)",
+    "groups": [
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        },
+        {
+            "name": "OutputOptions",
+            "displayName": "Output",
+            "isExpanded": false
+        },
+        {
+            "name": "diagnostic",
+            "displayName": "Diagnostic",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "OCICredentials",
+            "type": "connectedService:OCI",
+            "label": "OCI Credentials",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Specifies the OCI credentials to be used by the task in the build agent environment.\n\nYou can specify credentials using a service endpoint (of type _OCI_) in the task configuration or you can leave unspecified. If unspecified the task will attempt to obtain credentials from the following sources in order:\n\n* From task variables named _OCI.AccessKeyID_, _OCI.SecretAccessKey_ and optionally _OCI.SessionToken_.\n* From credentials set in environment variables in the build agent process. When using environment variables in the build agent process you may use the standard OCI environment variables: _OCI_ACCESS_KEY_ID_, _OCI_SECRET_ACCESS_KEY_ and optionally _OCI_SESSION_TOKEN_.\n* If the build agent is running on an Oracle EC2 instance, from the instance metadata associated with the EC2 instance. For credentials to be available from EC2 instance metadata the instance must have been started with an instance profile referencing a role granting permissions to the task to make calls to OCI on your behalf. See [Using an IAM Role to Grant Permissions to Applications Running on Oracle EC2 Instances](https://docs.OCI.Oracle.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html) for more information."
+        },
+        {
+            "name": "regionName",
+            "label": "OCI Region",
+            "type": "pickList",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The OCI region code (us-east-1, us-west-2 etc) of the region containing the OCI resource(s) the task will use or create. For more information see [OCI Regions and Endpoints](https://docs.OCI.Oracle.com/general/latest/gr/rande.html).\n\nIf a region is not explicitly configured the task will attempt to obtain the region to be used from the following sources:\n\n* From a task variable named _OCI.Region_.\n* From the standard OCI environment variable _OCI_REGION_ in the build agent's environment.\n*  If the build agent is running on an Oracle EC2 instance, from instance metadata associated with the EC2 instance.\n\n__Note:__ The regions listed in the picker are those known at the time this software was released. New regions that are not listed may still be used by entering the _region code_ of the region (for example _us_west_2_).",
+            "options": {},
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "applicationName",
+            "label": "Application Name",
+            "type": "string",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "The name of the OCI CodeDeploy application."
+        },
+        {
+            "name": "deploymentGroupName",
+            "label": "Deployment Group Name",
+            "type": "string",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "The name of the deployment group the revision is to be deployed to."
+        },
+        {
+            "name": "deploymentRevisionSource",
+            "label": "Deployment Revision Source",
+            "type": "pickList",
+            "defaultValue": "workspace",
+            "helpMarkDown": "Specifies the source of the revision to be deployed. You can select from:\n\n**Folder or archive file in the workspace**: the task will create or use an existing zip archive in the location specified to *Revision Bundle*, upload the archive to Oracle S3 and supply the key of the S3 object to CodeDeploy as the revision source.\n\n**Archive file in Oracle S3**: select to specify the key of an archive previously uploaded to Oracle S3 as the deployment revision source.",
+            "required": true,
+            "options": {
+                "workspace": "Folder or archive file in the workspace",
+                "s3": "Archive file in Oracle S3"
+            }
+        },
+        {
+            "name": "revisionBundle",
+            "label": "Revision Bundle",
+            "type": "filePath",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "deploymentRevisionSource = workspace",
+            "helpMarkDown": "The artifacts to be deployed.\n\nYou can supply a folder or a filename to this parameter. If a folder is supplied the task will zip the contents of the folder recursively into an archive file before uploading the archive to Oracle S3. If a filename is supplied the task uploads it, unmodified, to Oracle S3. Note that CodeDeploy requires the appspec.yml file describing the application to exist at the root of the specified folder or archive file."
+        },
+        {
+            "name": "bucketName",
+            "type": "string",
+            "label": "S3 Bucket Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The name of the Oracle S3 bucket to which the revision bundle will be will be uploaded."
+        },
+        {
+            "name": "bundlePrefix",
+            "type": "string",
+            "label": "Target Folder",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "deploymentRevisionSource = workspace",
+            "helpMarkDown": "Optional folder (key prefix) for the uploaded revision bundle in the bucket. If not specified the bundle will be uploaded to the root of the bucket."
+        },
+        {
+            "name": "bundleKey",
+            "type": "string",
+            "label": "Revision Bundle Key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "deploymentRevisionSource = s3",
+            "helpMarkDown": "The Oracle S3 object key of the previously uploaded archive file containing the deployment revision artifacts."
+        },
+        {
+            "name": "description",
+            "label": "Description",
+            "type": "string",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "Optional description for the deployment."
+        },
+        {
+            "name": "fileExistsBehavior",
+            "label": "Existing File Behavior",
+            "type": "pickList",
+            "defaultValue": "DISALLOW",
+            "helpMarkDown": "How OCI CodeDeploy should handle files that already exist in a deployment target location but weren't part of the previous successful deployment.",
+            "options": {
+                "DISALLOW": "Fail the deployment",
+                "OVERWRITE": "Overwrite the version already on the instance with the version in the new application revision",
+                "RETAIN": "Keep the version already on the instance as part of the new deployment"
+            }
+        },
+        {
+            "name": "updateOutdatedInstancesOnly",
+            "label": "Update Outdated Instances Only",
+            "type": "boolean",
+            "defaultValue": false,
+            "helpMarkDown": "If checked deploys to only those instances that are not running the latest application revision.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "ignoreApplicationStopFailures",
+            "label": "Ignore Application Stop Failures",
+            "type": "boolean",
+            "defaultValue": false,
+            "helpMarkDown": "If checked then if the deployment causes the ApplicationStop deployment lifecycle event to an instance to fail, the deployment to that instance will not be considered to have failed at that point and will continue on to the BeforeInstall deployment lifecycle event.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "timeoutInMins",
+            "type": "string",
+            "label": "Max Timeout (minutes)",
+            "defaultValue": "30",
+            "groupName": "advanced",
+            "helpMarkDown": "Maximum time, specified in minutes, that the task should wait for the deployment to complete. By default a maximum of 30 minutes is used.",
+            "required": false
+        },
+        {
+            "name": "outputVariable",
+            "type": "string",
+            "label": "Output Variable",
+            "defaultValue": "",
+            "groupName": "OutputOptions",
+            "helpMarkDown": "The name of the variable that will contain the deployment ID on task completion. The variable can be used as $(variableName) to refer to the function result in subsequent tasks.",
+            "required": false
+        },
+        {
+            "name": "logRequest",
+            "type": "boolean",
+            "label": "Log Request",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "If selected, request headers and other data for calls to OCI services are logged to the task's debug log.",
+            "groupName": "diagnostic"
+        },
+        {
+            "name": "logResponse",
+            "type": "boolean",
+            "label": "Log Response",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "If selected, the response metadata and body content of non-streaming responses from calls to OCI services are output to the task's debug log. The unique request ID, which can be useful when contacting OCI for support, is always logged to the task output regardless of this option setting.",
+            "groupName": "diagnostic"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "CodeDeployDeployApplication.js",
+            "argumentFormat": ""
+        }
+    },
+    "messages": {
+        "UploadingBundle": "Uploading revision bundle %s to object %s in bucket %s",
+        "BundleUploadCompleted": "Bundle upload completed successfully",
+        "BundleUploadFailed": "Upload of revision bundle failed with error: %s",
+        "DeployingRevision": "Deploying the new revision",
+        "DeploymentStarted": "Started deployment of new revision to deployment group %s for application %s, deployment ID %s",
+        "DeploymentError": "Request to deploy new revision returned error: %s",
+        "WaitingForDeployment": "Waiting for deployment to complete",
+        "WaitConditionSatisifed": "Deployment transitioned to successful status",
+        "DeploymentFailed": "Deployment failed",
+        "SettingOutputVariable": "Setting output variable %s with the ID of the deployment",
+        "ApplicationDoesNotExist": "Application %s does not exist",
+        "DeploymentGroupDoesNotExist": "Deployment group %s does not exist for application %s",
+        "CreatingDeploymentBundleArchiveFromFolder": "Creating deployment bundle archive from build output at %s",
+        "CreatedBundleArchive": "Created deployment bundle %s",
+        "ArchiveSize": "Archive size: %s total bytes",
+        "ZipError": "Zip Error: %s",
+        "RevisionBundleDoesNotExist": "Archive with key %s does not exist in the Oracle S3 bucket %s",
+        "DeletingUploadedBundle": "Deleting uploaded bundle %s created by task",
+        "TaskCompleted": "Deployment to application %s completed",
+        "SettingCustomTimeout": "Setting the custom timeout to %s minute(s)",
+        "UnknownRevisionSource": "Unknown revision source %s"
+    }
+}

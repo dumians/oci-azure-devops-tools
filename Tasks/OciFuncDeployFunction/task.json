@@ -1,0 +1,317 @@
+{
+    "id": "ec87c253-756f-4a7a-be91-4f1c60f9d8fe",
+    "name": "LambdaDeployFunction",
+    "friendlyName": "OCI Lambda Deploy Function",
+    "description": "General purpose deployment of OCI Lambda functions for all supported language runtimes.",
+    "author": "Oracle Web Services",
+    "helpMarkDown": "Please refer to [OCI Lambda Developer Guide](https://docs.OCI.Oracle.com/lambda/latest/dg/) for more information on working with OCI Lambda.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/lambda-deploy.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* lambda:CreateFunction\n* lambda:GetFunction\n* lambda:UpdateFunctionCode\n* lambda:UpdateFunctionConfiguration",
+    "category": "Deploy",
+    "visibility": ["Build", "Release"],
+    "demands": [],
+    "minimumAgentVersion": "1.91.0",
+    "instanceNameFormat": "Deploy Lambda Function: $(functionName)",
+    "groups": [
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": true,
+            "visibleRule": "deploymentMode = codeandconfiguration"
+        },
+        {
+            "name": "outputOptions",
+            "displayName": "Output",
+            "isExpanded": false
+        },
+        {
+            "name": "diagnostic",
+            "displayName": "Diagnostic",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "OCICredentials",
+            "type": "connectedService:OCI",
+            "label": "OCI Credentials",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Specifies the OCI credentials to be used by the task in the build agent environment.\n\nYou can specify credentials using a service endpoint (of type _OCI_) in the task configuration or you can leave unspecified. If unspecified the task will attempt to obtain credentials from the following sources in order:\n\n* From task variables named _OCI.AccessKeyID_, _OCI.SecretAccessKey_ and optionally _OCI.SessionToken_.\n* From credentials set in environment variables in the build agent process. When using environment variables in the build agent process you may use the standard OCI environment variables: _OCI_ACCESS_KEY_ID_, _OCI_SECRET_ACCESS_KEY_ and optionally _OCI_SESSION_TOKEN_.\n* If the build agent is running on an Oracle EC2 instance, from the instance metadata associated with the EC2 instance. For credentials to be available from EC2 instance metadata the instance must have been started with an instance profile referencing a role granting permissions to the task to make calls to OCI on your behalf. See [Using an IAM Role to Grant Permissions to Applications Running on Oracle EC2 Instances](https://docs.OCI.Oracle.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html) for more information."
+        },
+        {
+            "name": "regionName",
+            "label": "OCI Region",
+            "type": "pickList",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The OCI region code (us-east-1, us-west-2 etc) of the region containing the OCI resource(s) the task will use or create. For more information see [OCI Regions and Endpoints](https://docs.OCI.Oracle.com/general/latest/gr/rande.html).\n\nIf a region is not explicitly configured the task will attempt to obtain the region to be used from the following sources:\n\n* From a task variable named _OCI.Region_.\n* From the standard OCI environment variable _OCI_REGION_ in the build agent's environment.\n*  If the build agent is running on an Oracle EC2 instance, from instance metadata associated with the EC2 instance.\n\n__Note:__ The regions listed in the picker are those known at the time this software was released. New regions that are not listed may still be used by entering the _region code_ of the region (for example _us_west_2_).",
+            "options": {},
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "deploymentMode",
+            "type": "radio",
+            "label": "Deployment Mode",
+            "defaultValue": "codeonly",
+            "required": true,
+            "helpMarkDown": "Selects the type of deployment. You can deploy new function code to an existing function or you can specify settings for both code and configuration. For the 'code and configuration' mode if the function does not exist it will be created.",
+            "options": {
+                "codeonly": "Update code only",
+                "codeandconfiguration": "Update code and configuration (or create a new function)"
+            }
+        },
+        {
+            "name": "functionName",
+            "type": "string",
+            "label": "Function Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The name of the Lambda function to create or update. You can also specify the Oracle Resource Name (ARN) for an existing function."
+        },
+        {
+            "name": "description",
+            "type": "string",
+            "label": "Description",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "A short, user-defined function description. Lambda does not use this value.",
+            "visibleRule": "deploymentMode = codeandconfiguration"
+        },
+        {
+            "name": "functionHandler",
+            "type": "string",
+            "label": "Function Handler",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The function within your code that Lambda calls to begin execution. For Node.js, it is the module-name.export value in your function. For Java, it can be package.class-name::handler or package.class-name. For more information and other examples see [Programming Model](https://docs.OCI.Oracle.com/lambda/latest/dg/programming-model-v2.html).",
+            "visibleRule": "deploymentMode = codeandconfiguration"
+        },
+        {
+            "name": "runtime",
+            "type": "pickList",
+            "label": "Runtime",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The runtime environment for the Lambda function you are uploading. The list of runtimes available in the pick list are those known at the time this version of the tools was released. To use a runtime not shown in the list simply enter the runtime identifier in the field.",
+            "options": {
+                "provided": "provided",
+                "dotnetcore2.1": "dotnetcore2.1",
+                "go1.x": "go1.x",
+                "java8": "java8",
+                "nodejs8.10": "nodejs8.10",
+                "nodejs10.x": "nodejs10.x",
+                "python2.7": "python2.7",
+                "python3.6": "python3.6",
+                "python3.7": "python3.7",
+                "ruby2.5": "ruby2.5"
+            },
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "visibleRule": "deploymentMode = codeandconfiguration"
+        },
+        {
+            "name": "codeLocation",
+            "type": "radio",
+            "label": "Code Location",
+            "defaultValue": "localfile",
+            "required": true,
+            "helpMarkDown": "The source of the code for the function. You can select a zip file in the work area or a zip file previously uploaded to Oracle S3. If the source location is Oracle S3 you can also optionally supply a specific version of the file.",
+            "options": {
+                "localfile": "Zip file in the work area",
+                "s3object": "Zip file in Oracle S3"
+            }
+        },
+        {
+            "name": "localZipFile",
+            "type": "filePath",
+            "label": "Zip File Path",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "Path to the zip file containing the function code to deploy. Required if _Code Location_ is set to _Zip file in the work area_.",
+            "visibleRule": "codeLocation = localfile"
+        },
+        {
+            "name": "s3Bucket",
+            "type": "string",
+            "label": "S3 Bucket Name",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The name of the Oracle S3 bucket containing the previously uploaded zip file of the function's code. Required if _Code Location_ is set to _Zip file in Oracle S3_.",
+            "visibleRule": "codeLocation = s3object"
+        },
+        {
+            "name": "s3ObjectKey",
+            "type": "string",
+            "label": "S3 Object Key",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The key (name) of the object in the bucket containing the function's code.  Required if _Code Location_ is set to _Zip file in Oracle S3_.",
+            "visibleRule": "codeLocation = s3object"
+        },
+        {
+            "name": "s3ObjectVersion",
+            "type": "string",
+            "label": "S3 Object Version",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "Version of the S3 object containing the function code. If not specified the latest version of the object is used.",
+            "visibleRule": "codeLocation = s3object"
+        },
+        {
+            "name": "roleARN",
+            "type": "string",
+            "label": "Role ARN or Name",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "The Oracle Resource Name (ARN), or name, of the IAM role that Lambda assumes when it executes your function to access any other Oracle Web Services (OCI) resources. If a role name is supplied the task will attempt to retrieve the ARN automatically.",
+            "visibleRule": "deploymentMode = codeandconfiguration"
+        },
+        {
+            "name": "memorySize",
+            "type": "string",
+            "label": "Memory Size",
+            "required": false,
+            "defaultValue": "128",
+            "helpMarkDown": "The amount of memory, in MB, your Lambda function is given. Lambda uses this memory size to infer the amount of CPU and memory allocated to your function. Your function use-case determines your CPU and memory requirements. For example, a database operation might need less memory compared to an image processing function. The default value is 128 MB. The value must be a multiple of 64 MB.",
+            "visibleRule": "deploymentMode = codeandconfiguration"
+        },
+        {
+            "name": "timeout",
+            "type": "string",
+            "label": "Timeout",
+            "required": false,
+            "defaultValue": "3",
+            "helpMarkDown": "The function execution time at which Lambda should terminate the function. Because the execution time has cost implications, we recommend you set this value based on your expected execution time. The default is 3 seconds.",
+            "visibleRule": "deploymentMode = codeandconfiguration"
+        },
+        {
+            "name": "publish",
+            "type": "boolean",
+            "label": "Publish",
+            "required": false,
+            "defaultValue": "true",
+            "helpMarkDown": "If set requests OCI Lambda to create or update the Lambda function and publish a version as an atomic operation."
+        },
+        {
+            "name": "layers",
+            "type": "multiLine",
+            "label": "Lambda Layers",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "List of Lambda Layer ARNs (including version), one per line.",
+            "visibleRule": "deploymentMode = codeandconfiguration"
+        },
+        {
+            "name": "deadLetterARN",
+            "type": "string",
+            "label": "Dead Letter ARN",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The Oracle Resource Name (ARN) of an Oracle SQS queue or Oracle SNS topic to be used as your Dead Letter Queue (DLQ).",
+            "groupName": "advanced"
+        },
+        {
+            "name": "kmsKeyARN",
+            "type": "string",
+            "label": "KMS Key ARN",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The Oracle Resource Name (ARN) of the KMS key used to encrypt your function's environment variables. If not provided, OCI Lambda will use a default service key.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "environment",
+            "type": "multiLine",
+            "label": "Environment Variables",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "Key-value pairs that represent your environment's configuration settings. Enter as Name=Value, one per line.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "tags",
+            "type": "multiLine",
+            "label": "Tags",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "List of tags (key-value pairs) assigned to the new function. Enter as Key=Value, one per line. Tags can only be specified when creating a new function and are ignored when updating functions.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "securityGroups",
+            "type": "multiLine",
+            "label": "Security Group IDs",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "List of security group IDs, one per line. If your Lambda function accesses resources in a VPC at least one security group and one subnet ID must be specified, which must belong to the same VPC.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "subnets",
+            "type": "multiLine",
+            "label": "Subnet IDs",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "List of subnet IDs, one per line. If your Lambda function accesses resources in a VPC at least one security group and one subnet ID must be specified, which must belong to the same VPC.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "tracingConfig",
+            "type": "pickList",
+            "label": "Tracing Configuration",
+            "required": false,
+            "defaultValue": "XRay",
+            "helpMarkDown": "Trace settings for your function.",
+            "options": {
+                "XRay": "X-Ray",
+                "Active": "Respect any tracing header received from an upstream service",
+                "PassThrough": "Only trace the request from an upstream service if it contains a tracing header with 'sampled=1'"
+            },
+            "groupName": "advanced"
+        },
+        {
+            "name": "outputVariable",
+            "type": "string",
+            "label": "Output Variable",
+            "defaultValue": "",
+            "groupName": "outputOptions",
+            "helpMarkDown": "The name of the variable that will contain the Oracle Resource Name (ARN) of the created or updated function on task completion. The variable can be used as $(variableName) to refer to the function result in subsequent tasks.",
+            "required": false
+        },
+        {
+            "name": "logRequest",
+            "type": "boolean",
+            "label": "Log Request",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "If selected, request headers and other data for calls to OCI services are logged to the task's debug log.",
+            "groupName": "diagnostic"
+        },
+        {
+            "name": "logResponse",
+            "type": "boolean",
+            "label": "Log Response",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "If selected, the response metadata and body content of non-streaming responses from calls to OCI services are output to the task's debug log. The unique request ID, which can be useful when contacting OCI for support, is always logged to the task output regardless of this option setting.",
+            "groupName": "diagnostic"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "LambdaDeployFunction.js",
+            "argumentFormat": ""
+        }
+    },
+    "messages": {
+        "CreatingFunction": "Creating new function %s",
+        "UpdatingFunctionCode": "Updating code for function %s",
+        "UpdatingFunctionConfiguration": "Updating configuration for function %s",
+        "FunctionNotFound": "Function %s does not exist, cannot update code only",
+        "TaskCompleted": "Completed create or update of Lambda function %s, function ARN %s",
+        "AddingTag": "Adding tag. Key '%s', Value '%s'",
+        "NoFunctionArnReturned": "No function ARN returned from the service! Deployment failed!"
+    }
+}

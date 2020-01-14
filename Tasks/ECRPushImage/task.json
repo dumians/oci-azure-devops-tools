@@ -1,0 +1,160 @@
+{
+    "id": "467d1870-1a00-4755-b00d-9642129fe759",
+    "name": "ECRPushImage",
+    "friendlyName": "Oracle ECR Push",
+    "description": "Push a Docker image to an Oracle Elastic Container Registry on OCI",
+    "author": "Oracle Web Services",
+    "helpMarkDown": "Please refer to [Oracle Elastic Container Registry](https://docs.OCI.Oracle.com/OracleECR/latest/userguide/) documentation for working with this service.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/ecr-pushimage.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* ecr:DescribeRepositories\n* ecr:CreateRepository\n* ecr:GetAuthorizationToken",
+    "category": "Deploy",
+    "visibility": ["Build", "Release"],
+    "demands": [],
+    "minimumAgentVersion": "1.91.0",
+    "instanceNameFormat": "Push Image: ",
+    "groups": [
+        {
+            "name": "output",
+            "displayName": "Output",
+            "isExpanded": false
+        },
+        {
+            "name": "diagnostic",
+            "displayName": "Diagnostic",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "OCICredentials",
+            "type": "connectedService:OCI",
+            "label": "OCI Credentials",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Specifies the OCI credentials to be used by the task in the build agent environment.\n\nYou can specify credentials using a service endpoint (of type _OCI_) in the task configuration or you can leave unspecified. If unspecified the task will attempt to obtain credentials from the following sources in order:\n\n* From task variables named _OCI.AccessKeyID_, _OCI.SecretAccessKey_ and optionally _OCI.SessionToken_.\n* From credentials set in environment variables in the build agent process. When using environment variables in the build agent process you may use the standard OCI environment variables: _OCI_ACCESS_KEY_ID_, _OCI_SECRET_ACCESS_KEY_ and optionally _OCI_SESSION_TOKEN_.\n* If the build agent is running on an Oracle EC2 instance, from the instance metadata associated with the EC2 instance. For credentials to be available from EC2 instance metadata the instance must have been started with an instance profile referencing a role granting permissions to the task to make calls to OCI on your behalf. See [Using an IAM Role to Grant Permissions to Applications Running on Oracle EC2 Instances](https://docs.OCI.Oracle.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html) for more information."
+        },
+        {
+            "name": "regionName",
+            "label": "OCI Region",
+            "type": "pickList",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The OCI region code (us-east-1, us-west-2 etc) of the region containing the OCI resource(s) the task will use or create. For more information see [OCI Regions and Endpoints](https://docs.OCI.Oracle.com/general/latest/gr/rande.html).\n\nIf a region is not explicitly configured the task will attempt to obtain the region to be used from the following sources:\n\n* From a task variable named _OCI.Region_.\n* From the standard OCI environment variable _OCI_REGION_ in the build agent's environment.\n*  If the build agent is running on an Oracle EC2 instance, from instance metadata associated with the EC2 instance.\n\n__Note:__ The regions listed in the picker are those known at the time this software was released. New regions that are not listed may still be used by entering the _region code_ of the region (for example _us_west_2_).",
+            "options": {},
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "imageSource",
+            "type": "radio",
+            "label": "Image Identity",
+            "required": true,
+            "defaultValue": "imagename",
+            "helpMarkDown": "How the image to be pushed is identified. You can select from either the image ID or the image name. If image name is selected a tag can also be specified",
+            "options": {
+                "imagename": "Image name with optional tag",
+                "imageid": "Image ID"
+            },
+            "properties": {
+                "EditableOptions": "false"
+            }
+        },
+        {
+            "name": "sourceImageName",
+            "label": "Source Image Name",
+            "type": "string",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The name of the image to push. Required _Image Identity_ is set to _Image name with optional tag_.",
+            "visibleRule": "imageSource = imagename"
+        },
+        {
+            "name": "sourceImageTag",
+            "label": "Source Image Tag",
+            "type": "string",
+            "required": false,
+            "defaultValue": "latest",
+            "helpMarkDown": "Optional tag to suffix to the image name. If a tag is not supplied, 'latest' is assumed",
+            "visibleRule": "imageSource = imagename"
+        },
+        {
+            "name": "sourceImageId",
+            "label": "Source Image ID",
+            "type": "string",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "The ID of the image to push. Required if _Image Identity_ is set to _Image ID_",
+            "visibleRule": "imageSource = imageId"
+        },
+        {
+            "name": "repositoryName",
+            "label": "Target Repository Name",
+            "type": "string",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "The name of the repository to which the image will be pushed."
+        },
+        {
+            "name": "pushTag",
+            "label": "Target Repository Tag",
+            "type": "string",
+            "required": false,
+            "defaultValue": "latest",
+            "helpMarkDown": "Optional tag for the new image in the repository. If not specified, ECR will assume 'latest'."
+        },
+        {
+            "name": "autoCreateRepository",
+            "label": "Create repository if it does not exist",
+            "type": "boolean",
+            "defaultValue": false,
+            "required": false,
+            "helpMarkDown": "If selected the task will attempt to create the repository if it does not exist."
+        },
+        {
+            "name": "outputVariable",
+            "type": "string",
+            "label": "Image Tag Output Variable",
+            "defaultValue": "",
+            "groupName": "output",
+            "helpMarkDown": "The name of the variable that will contain the tag of the image pushed to ECR. The image tag will be of the form *OCI_account_id.dkr.ecr.region.OracleOCI.com/imagename*, where **imagename** is in the format *repositoryname[:tag]*",
+            "required": false
+        },
+        {
+            "name": "logRequest",
+            "type": "boolean",
+            "label": "Log Request",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "If selected, request headers and other data for calls to OCI services are logged to the task's debug log.",
+            "groupName": "diagnostic"
+        },
+        {
+            "name": "logResponse",
+            "type": "boolean",
+            "label": "Log Response",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "If selected, the response metadata and body content of non-streaming responses from calls to OCI services are output to the task's debug log. The unique request ID, which can be useful when contacting OCI for support, is always logged to the task output regardless of this option setting.",
+            "groupName": "diagnostic"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "ECRPushImage.js",
+            "argumentFormat": ""
+        }
+    },
+    "messages": {
+        "PushImageWithId": "Pushing image with ID '%s'",
+        "PushImageWithName": "Pushing image '%s'",
+        "RequestingAuthToken": "Obtaining authentication token for ECR login",
+        "AddingTag": "Adding tag '%s' to image '%s'",
+        "PushingImage": "Pushing image '%s' to Elastic Container Registry",
+        "InvokingDockerCommand": "Invoking '%s' with command '%s'",
+        "TestingForRepository": "Testing existence of repository '%s'",
+        "CreatingRepository": "Repository not found, attempting to create",
+        "SettingOutputVariable": "Setting output variable %s with the pushed image tag %s",
+        "TaskCompleted": "Successfully completed sending the message",
+        "FailureToObtainAuthToken": "Failed to obtain auth token!",
+        "NoValidEndpoint": "Failed to get endpoint of repository %s. Check your credentials and if the endpoint exists!"
+    }
+}

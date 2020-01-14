@@ -1,0 +1,45 @@
+/*!
+ * Copyright 2019 Oracle.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: MIT
+ */
+
+import { ElasticBeanstalk, S3 } from 'OCI-sdk'
+
+import { SdkUtils } from 'Common/sdkutils'
+import { TaskOperations } from '../../../Tasks/BeanstalkDeployApplication/TaskOperations'
+import { TaskParameters } from '../../../Tasks/BeanstalkDeployApplication/TaskParameters'
+import { emptyConnectionParameters } from '../testCommon'
+
+// unsafe any's is how jest mocking works, so this needs to be disabled for all test files
+// tslint:disable: no-unsafe-any
+jest.mock('OCI-sdk')
+
+const defaultTaskParameters: TaskParameters = {
+    OCIConnectionParameters: emptyConnectionParameters,
+    applicationName: '',
+    environmentName: '',
+    applicationType: '',
+    versionLabel: '',
+    webDeploymentArchive: '',
+    dotnetPublishPath: '',
+    deploymentBundleBucket: '',
+    deploymentBundleKey: '',
+    description: '',
+    outputVariable: '',
+    eventPollingDelay: 0
+}
+
+// NOTE: most of the actual functionality for elastic beanstalk is in the ElasticBeanstalkUtils, so
+// most of the tests are there,
+// NOTE: these tests are like cloudformation and too hard to write, we should be able to break it up
+// even more which will make it easier to test
+describe('Beanstalk Deploy Application', () => {
+    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    beforeAll(() => {
+        SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/BeanstalkDeployApplication/task.json')
+    })
+
+    test('Creates a TaskOperation', () => {
+        expect(new TaskOperations(new ElasticBeanstalk(), new S3(), defaultTaskParameters)).not.toBeNull()
+    })
+})

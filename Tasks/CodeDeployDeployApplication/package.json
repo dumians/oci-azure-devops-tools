@@ -1,0 +1,12 @@
+{
+    "name": "codedeploy.deploy",
+    "version": "1.1.8",
+    "description": "Deploy an application to Oracle EC2 instances using OCI CodeDeploy",
+    "main": "CodeDeployDeployApplication.js",
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "archiver": "^2.0.0",
+        "sdkutils": "file:../../_build/Tasks/Common/sdkutils"
+    }
+}
