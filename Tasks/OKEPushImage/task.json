@@ -1,10 +1,10 @@
 {
     "id": "467d1870-1a00-4755-b00d-9642129fe759",
-    "name": "ECRPushImage",
+    "name": "OKEPushImage",
     "friendlyName": "Oracle ECR Push",
-    "description": "Push a Docker image to an Oracle Elastic Container Registry on OCI",
+    "description": "Push a Docker image to an Oracle Container Registry on OCI",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [Oracle Elastic Container Registry](https://docs.OCI.Oracle.com/OracleECR/latest/userguide/) documentation for working with this service.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/ecr-pushimage.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* ecr:DescribeRepositories\n* ecr:CreateRepository\n* ecr:GetAuthorizationToken",
+    "helpMarkDown": "Please refer to [Oracle Container Registry](https://docs.OCI.Oracle.com/OracleECR/latest/userguide/) documentation for working with this service.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/ecr-pushimage.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* ecr:DescribeRepositories\n* ecr:CreateRepository\n* ecr:GetAuthorizationToken",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
