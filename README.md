@@ -1,19 +1,17 @@
-# Overview
+# Overview 
 
-OCI Tools for Microsoft Visual Studio Team Services (VSTS) adds tasks to easily enable build and release pipelines in VSTS and Team Foundation Server to work with OCI services including Oracle Storage, OCI , OCI CodeDeploy, OCI Lambda, OCI CloudFormation, Oracle Simple Queue Service and Oracle Simple Notification Service, and run commands using the OCI Tools for Windows PowerShell module and the OCI CLI.
+OCI Tools for Microsoft Visual Studio Team Services (VSTS) adds tasks to easily enable build and release pipelines in VSTS and Team Foundation Server to work with OCI services including Oracle Storage, OCI Container Service, OCI Functions, and run commands using the OCI Tools for Windows PowerShell module and the OCI CLI.
 
 This is an open source project because we want you to be involved. We love issues, feature requests, code reviews, pull
 requests or any positive contribution. Please see the the [CONTRIBUTING](CONTRIBUTING.md) guide for how to help, including how to build your own extension.
 
 ## Highlighted Features
 
--   OCICLI - Interact with the OCICLI (Windows hosts only)
+-   OCI-CLI - Interact with the OCI-CLI (Windows hosts only)
 -   OCI Powershell Module - Interact with OCI through powershell (Windows hosts only)
--   Beanstalk - Deploy ElasticBeanstalk applications
--   CodeDeploy - Deploy with CodeDeploy
--   CloudFormation - Create/Delete/Update CloudFormation stacks
--   Lambda - Deploy from S3, .net core applications, or any other language that builds on VSTS
--   Block - Upload/Download to/from S3 buckets
+-
+-   Function - Deploy from BlockStorage, .net core applications, or any other language that builds on VSTS
+-   Block - Upload/Download to/from BlockStorage buckets
 -   Secrets Manager - Create and retrieve secrets
 -   Systems manager - Get/set parameters and run commands
 
@@ -41,7 +39,6 @@ The OCI tasks support the following mechanisms for obtaining OCI credentials:
 -   Azure Devops
 -   Team Foundation Server 2015 Update 3 (or higher)
 
-**Note for Team Foundation Server 2015 Users:** Team Foundation Server 2015 users should download the extension from [here](https://sdk-for-net.Oraclewebservices.com/latest/Oraclewebservices.OCI-vsts-tools-tfs2015.vsix). This temporary version contains the same tasks as the version in the marketplace but removes the support for extra fields in the _OCI_ endpoint type to support _Assume Role_ credentials. These fields, although marked optional, are unfortunately treated as required in TFS 2015 editions.
 
 ## License
 
