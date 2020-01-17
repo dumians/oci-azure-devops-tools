@@ -1,6 +1,6 @@
 # Overview
 
-OCI Tools for Microsoft Visual Studio Team Services (VSTS) adds tasks to easily enable build and release pipelines in VSTS and Team Foundation Server to work with OCI services including Oracle S3, OCI Elastic Beanstalk, OCI CodeDeploy, OCI Lambda, OCI CloudFormation, Oracle Simple Queue Service and Oracle Simple Notification Service, and run commands using the OCI Tools for Windows PowerShell module and the OCI CLI.
+OCI Tools for Microsoft Visual Studio Team Services (VSTS) adds tasks to easily enable build and release pipelines in VSTS and Team Foundation Server to work with OCI services including Oracle Storage, OCI , OCI CodeDeploy, OCI Lambda, OCI CloudFormation, Oracle Simple Queue Service and Oracle Simple Notification Service, and run commands using the OCI Tools for Windows PowerShell module and the OCI CLI.
 
 This is an open source project because we want you to be involved. We love issues, feature requests, code reviews, pull
 requests or any positive contribution. Please see the the [CONTRIBUTING](CONTRIBUTING.md) guide for how to help, including how to build your own extension.
@@ -13,7 +13,7 @@ requests or any positive contribution. Please see the the [CONTRIBUTING](CONTRIB
 -   CodeDeploy - Deploy with CodeDeploy
 -   CloudFormation - Create/Delete/Update CloudFormation stacks
 -   Lambda - Deploy from S3, .net core applications, or any other language that builds on VSTS
--   S3 - Upload/Download to/from S3 buckets
+-   Block - Upload/Download to/from S3 buckets
 -   Secrets Manager - Create and retrieve secrets
 -   Systems manager - Get/set parameters and run commands
 
@@ -33,8 +33,7 @@ The OCI tasks support the following mechanisms for obtaining OCI credentials:
         variables are named _OCI.AccessKeyID_, _OCI.SecretAccessKey_ and optionally _OCI.SessionToken_. To supply the ID of the region to make the call in, e.g. us-west-2, you can also use the variable _OCI.Region_.
 -   Environment variables in the build agent's environment.
     -   If tasks are not configured with the name of a service endpoint, and credentials or region are not available from task variables, the tasks will attempt to obtain credentials, and optionally region, from standard environment variables in the build process environment. These variables are _OCI_ACCESS_KEY_ID_, _OCI_SECRET_ACCESS_KEY_ and optionally _OCI_SESSION_TOKEN_. To supply the ID of the region to make the call in, e.g. us-west-2, you can also use the environment variable _OCI_REGION_.
--   EC2 instance metadata, for build hosts running on EC2 instances.
-    -   Both credential and region information can be automatically obtained from the instance metadata in this scenario.
+   -   Both credential and region information can be automatically obtained from the instance metadata in this scenario.
 
 
 ## Supported environments
