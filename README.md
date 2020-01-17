@@ -1,11 +1,6 @@
 # Overview
 
-Build: ![TravisCI Build Status - master branch](https://travis-ci.org/OCI/OCI-vsts-tools.svg?branch=master)
-Coverage: [![codecov](https://codecov.io/gh/OCI/OCI-vsts-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/OCI/OCI-vsts-tools)
-
 OCI Tools for Microsoft Visual Studio Team Services (VSTS) adds tasks to easily enable build and release pipelines in VSTS and Team Foundation Server to work with OCI services including Oracle S3, OCI Elastic Beanstalk, OCI CodeDeploy, OCI Lambda, OCI CloudFormation, Oracle Simple Queue Service and Oracle Simple Notification Service, and run commands using the OCI Tools for Windows PowerShell module and the OCI CLI.
-
-OCI Tools for VSTS is available from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=OracleWebServices.OCI-vsts-tools).
 
 This is an open source project because we want you to be involved. We love issues, feature requests, code reviews, pull
 requests or any positive contribution. Please see the the [CONTRIBUTING](CONTRIBUTING.md) guide for how to help, including how to build your own extension.
@@ -17,17 +12,13 @@ requests or any positive contribution. Please see the the [CONTRIBUTING](CONTRIB
 -   Beanstalk - Deploy ElasticBeanstalk applications
 -   CodeDeploy - Deploy with CodeDeploy
 -   CloudFormation - Create/Delete/Update CloudFormation stacks
--   ECR - Push an image to an ECR repository
 -   Lambda - Deploy from S3, .net core applications, or any other language that builds on VSTS
 -   S3 - Upload/Download to/from S3 buckets
 -   Secrets Manager - Create and retrieve secrets
--   SQS - Send SQS messages
--   SNS - Send SNS messages
 -   Systems manager - Get/set parameters and run commands
 
 ## User Guide
 
-The [User Guide](https://docs.OCI.Oracle.com/vsts/latest/userguide/welcome.html) contains additional instructions for getting up and running with the extension.
 
 ## Credentials Handling for OCI Services
 
@@ -45,19 +36,6 @@ The OCI tasks support the following mechanisms for obtaining OCI credentials:
 -   EC2 instance metadata, for build hosts running on EC2 instances.
     -   Both credential and region information can be automatically obtained from the instance metadata in this scenario.
 
-### Configuring an OCI Service Endpoint
-
-To use _OCI_ service endpoints add the OCI subscription(s) to use by opening the Account Administration screen (gear icon on the top-right of the screen) and then click on the Services Tab. Note that each VSTS/TFS project is associated with its own set of credentials. Service endpoints are not shared across projects. You can associate a single service endpoint to be used with all OCI tasks in a build or multiple endpoints if you require.
-
-Select the _OCI_ endpoint type and provide the following parameters. Please refer to [About Access Keys](https://OCI.Oracle.com/developers/access-keys/):
-
--   A name used to refer to the credentials when configuring the OCI tasks
--   OCI Access Key ID
--   OCI Secret Access Key
-
-**Note** We strongly suggest you use access and secret keys generated for an Identity and Access Management (IAM) user account. You can configure an IAM user account with permissions granting access to only the services and resources required to support the tasks you intend to use in your build and release definitions.
-
-Tasks can also use assumed role credentials by adding the Oracle Resource name (ARN) of the role to be assumed and an optional identifier when configuring the endpoint. The access and secret keys specified will then be used to generate temporary credentials for the tasks when they are executed by the build agents. Temporary credentials are valid for up to 15 minutes by default. To enable a longer validity period you can set the 'OCI.rolecredential.maxduration' variable on your build or release definition, specifying a validity period in seconds between 15 minutes (900 seconds) and one hour (3600 seconds).
 
 ## Supported environments
 
