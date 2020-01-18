@@ -4,7 +4,7 @@
     "friendlyName": "Oracle OKE Pull",
     "description": "Pull a Docker image from an Oracle Container Registry on OCI",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [Oracle  Container Registry](https://docs.OCI.Oracle.com/OracleECR/latest/userguide/) documentation for working with this service.\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* ecr:DescribeRepositories\n* ecr:GetDownloadUrlForLayer\n* ecr:GetAuthorizationToken \n* ecr:BatchGetImage \n* ecr:BatchCheckLayerAvailability",
+    "helpMarkDown": "Please refer to [Oracle  Container Registry](https://docs.OCI.Oracle.com/OracleECR/latest/userguide/) documentation for working with this service.\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* OKE:DescribeRepositories\n* OKE:GetDownloadUrlForLayer\n* OKE:GetAuthorizationToken \n* OKE:BatchGetImage \n* OKE:BatchCheckLayerAvailability",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
@@ -72,7 +72,7 @@
             "type": "string",
             "required": false,
             "defaultValue": "latest",
-            "helpMarkDown": "Optional tag for the new image in the repository. If not specified, ECR will assume 'latest'.",
+            "helpMarkDown": "Optional tag for the new image in the repository. If not specified, OKE will assume 'latest'.",
             "visibleRule": "imageSource = imagetag"
         },
         {
@@ -90,7 +90,7 @@
             "label": "Image Tag Output Variable",
             "defaultValue": "",
             "groupName": "output",
-            "helpMarkDown": "The name of the variable that will contain the tag of the image pulled from ECR. The image tag will be of the form *OCI_account_id.dkr.ecr.region.OracleOCI.com/imagename*, where **imagename** is in the format *repositoryname[:tag]*",
+            "helpMarkDown": "The name of the variable that will contain the tag of the image pulled from OKE. The image tag will be of the form *OCI_account_id.dkr.OKE.region.OracleOCI.com/imagename*, where **imagename** is in the format *repositoryname[:tag]*",
             "required": false
         },
         {
@@ -123,7 +123,7 @@
         "PullImageWithTag": "Pulling image from %s with tag '%s'",
         "PullingImage": "Pulling image '%s' from Elastic Container Registry",
         "InvokingDockerCommand": "Invoking '%s' with command '%s'",
-        "RequestingAuthToken": "Obtaining authentication token for ECR login",
+        "RequestingAuthToken": "Obtaining authentication token for OKE login",
         "FailureToObtainAuthToken": "Failed to obtain auth token!",
         "NoValidEndpoint": "Failed to get endpoint of repository %s. Check your credentials and if the endpoint exists!",
         "TaskCompleted": "Successfully completed sending the message",

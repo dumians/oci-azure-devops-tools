@@ -48,7 +48,7 @@ export class DotNetCliWrapper {
 
     private async updateGlobalTools(): Promise<boolean> {
         try {
-            const returnCode = await this.execute(['tool', 'update', '-g', 'Oracle.Lambda.Tools'], '')
+            const returnCode = await this.execute(['tool', 'update', '-g', 'Oracle.Function.Tools'], '')
             if (returnCode === 0) {
                 return true
             } else {
@@ -65,7 +65,7 @@ export class DotNetCliWrapper {
 
     private async installGlobalTools(): Promise<boolean> {
         try {
-            const returnCode = await this.execute(['tool', 'install', '-g', 'Oracle.Lambda.Tools'], '')
+            const returnCode = await this.execute(['tool', 'install', '-g', 'Oracle.Function.Tools'], '')
             if (returnCode === 0) {
                 return true
             } else {
@@ -84,11 +84,11 @@ export class DotNetCliWrapper {
 
         tl.debug(tl.loc('InstallingOrUpdatingLambdaTools'))
         if (!(await wrapper.installGlobalTools())) {
-            // if checking for lambda tools fails and installing them fails, we are probably on the
+            // if checking for Function tools fails and installing them fails, we are probably on the
             // wrong instance type because we were unable to install. This is fine, we might be able to
             // use the old tools
             tl.error(
-                'Unable to install global Oracle.Lambda.Tools! The old package based version of Oracle.Lambda.Tools ' +
+                'Unable to install global Oracle.Function.Tools! The old package based version of Oracle.Function.Tools ' +
                     'is now deprecated. Newer .NET core versions will need to use a newer hosted agent and the ' +
                     "global tools (which this task auto installs). Refer to Microsoft's guide for the correct hosted " +
                     'agent for which hosted agent you need to use newer .NET Core versions:' +
@@ -138,11 +138,11 @@ export class DotNetLambdaWrapper {
             args.push(OCIRegion)
         }
         if (s3Bucket) {
-            args.push('--s3-bucket')
+            args.push('--BlockStorage-bucket')
             args.push(s3Bucket)
         }
         if (s3Prefix) {
-            args.push('--s3-prefix')
+            args.push('--BlockStorage-prefix')
             args.push(s3Prefix)
         }
 
@@ -240,7 +240,7 @@ export class DotNetLambdaWrapper {
         } else {
             // else support legacy method
             dotnet = tl.tool(this.dotnetCliPath)
-            dotnet.arg('lambda')
+            dotnet.arg('Function')
         }
 
         for (const arg of args) {

@@ -4,7 +4,7 @@
     "version": "1.1.8",
     "name": "OCI Tools for Microsoft Visual Studio Team Services",
     "scopes": ["vso.build", "vso.build_execute", "vso.release"],
-    "description": "Tasks for Oracle S3, OCI Elastic Beanstalk, OCI CodeDeploy, OCI Lambda and OCI CloudFormation and more, and running commands in the OCI Tools for Windows PowerShell module and the OCI CLI.",
+    "description": "Tasks for Oracle BlockStorage, OCI OKE , OCI Developer, OCI Function  and more, and running commands in the OCI Tools for Windows PowerShell module and the OCI CLI.",
     "publisher": "unknown",
     "public": false,
     "icons": {
@@ -25,10 +25,10 @@
     ],
     "tags": [
         "OCI",
-        "S3",
+        "BlockStorage",
         "CloudFormation",
         "OCI CLI",
-        "Lambda",
+        "Function",
         "Serverless",
         "CodeDeploy",
         "Elastic Beanstalk",
@@ -47,15 +47,15 @@
             "uri": "https://OCI.Oracle.com/vsts?referer=vsmarketplace"
         },
         "license": {
-            "uri": "https://github.com/OCI/OCI-vsts-tools/blob/master/LICENSE"
+            "uri": "https://github.com/dumians/OCI-vsts-tools/blob/master/LICENSE"
         },
         "support": {
-            "uri": "https://github.com/OCI/OCI-vsts-tools/issues"
+            "uri": "https://github.com/dumians/OCI-vsts-tools/issues"
         }
     },
     "repository": {
         "type": "git",
-        "uri": "https://github.com/OCI/OCI-vsts-tools"
+        "uri": "https://github.com/dumians/OCI-vsts-tools"
     },
     "branding": {
         "color": "rgb(220, 235, 252)",
@@ -328,7 +328,7 @@
         },
         {
             "id": "LambdaDeployFunction",
-            "description": "General purpose deployment for OCI Lambda functions",
+            "description": "General purpose deployment for OCI Function functions",
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
@@ -337,7 +337,7 @@
         },
         {
             "id": "LambdaInvokeFunction",
-            "description": "Invokes an OCI Lambda function with a JSON payload",
+            "description": "Invokes an OCI Function function with a JSON payload",
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
@@ -346,7 +346,7 @@
         },
         {
             "id": "LambdaNETCoreDeploy",
-            "description": "Build and deploy a .NET Core OCI Lambda function",
+            "description": "Build and deploy a .NET Core OCI Function function",
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
@@ -355,7 +355,7 @@
         },
         {
             "id": "S3Download",
-            "description": "Download files from an Oracle Simple Storage Service (S3) Bucket",
+            "description": "Download files from an Oracle Simple Storage Service (BlockStorage) Bucket",
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
@@ -364,7 +364,7 @@
         },
         {
             "id": "S3Upload",
-            "description": "Upload files to an Oracle Simple Storage Service (S3) Bucket",
+            "description": "Upload files to an Oracle Simple Storage Service (BlockStorage) Bucket",
             "type": "ms.vss-distributed-task.task",
             "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {

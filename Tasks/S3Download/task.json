@@ -1,15 +1,15 @@
 {
     "id": "30f6a876-1d27-450c-b2bb-9f390a592082",
     "name": "S3Download",
-    "friendlyName": "Oracle S3 Download",
-    "description": "Download file and folder content from an Oracle Simple Storage Service (S3) Bucket on OCI",
+    "friendlyName": "Oracle BlockStorage Download",
+    "description": "Download file and folder content from an Oracle Simple Storage Service (BlockStorage) Bucket on OCI",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [Working with Oracle S3 Buckets](https://docs.OCI.Oracle.com/OracleS3/latest/dev/UsingBucket.html) for more information on working with Oracle S3.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/s3-download.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* s3:GetObject\n* s3:HeadBucket\n* s3:ListObjects",
+    "helpMarkDown": "Please refer to [Working with Oracle BlockStorage Buckets](https://docs.OCI.Oracle.com/OracleS3/latest/dev/UsingBucket.html) for more information on working with Oracle BlockStorage.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/BlockStorage-download.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* BlockStorage:GetObject\n* BlockStorage:HeadBucket\n* BlockStorage:ListObjects",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
     "minimumAgentVersion": "1.91.0",
-    "instanceNameFormat": "S3 Download: $(bucketName)",
+    "instanceNameFormat": "BlockStorage Download: $(bucketName)",
     "groups": [
         {
             "name": "serverSideEncryption",
@@ -54,7 +54,7 @@
             "label": "Bucket Name",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The name of the Oracle S3 bucket containing the content to be download."
+            "helpMarkDown": "The name of the Oracle BlockStorage bucket containing the content to be download."
         },
         {
             "name": "sourceFolder",
@@ -62,7 +62,7 @@
             "label": "Source Folder",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "The source folder (or S3 key prefix) in the bucket that the filename pattern(s) will be run against to select objects to download. If not set the root of the bucket is assumed."
+            "helpMarkDown": "The source folder (or BlockStorage key prefix) in the bucket that the filename pattern(s) will be run against to select objects to download. If not set the root of the bucket is assumed."
         },
         {
             "name": "globExpressions",
@@ -86,9 +86,9 @@
             "label": "Encryption Key Management",
             "defaultValue": "noneOrOCIManaged",
             "required": false,
-            "helpMarkDown": "When you retrieve an object from Oracle S3 that was encrypted by using server-side encryption with customer-provided encryption keys (SSE-C), set *Use customer-provided encryption key* and provide the customer key data to enable the object(s) to be decrypted. If the object(s) were encrypted using an Oracle S3-provided key leave this option set to the default value, *Not using server-side encryption, or encrypted using an Oracle S3 managed key*.",
+            "helpMarkDown": "When you retrieve an object from Oracle BlockStorage that was encrypted by using server-side encryption with customer-provided encryption keys (SSE-C), set *Use customer-provided encryption key* and provide the customer key data to enable the object(s) to be decrypted. If the object(s) were encrypted using an Oracle BlockStorage-provided key leave this option set to the default value, *Not using server-side encryption, or encrypted using an Oracle BlockStorage managed key*.",
             "options": {
-                "noneOrOCIManaged": "Not using server-side encryption, or encrypted using an Oracle S3 managed key",
+                "noneOrOCIManaged": "Not using server-side encryption, or encrypted using an Oracle BlockStorage managed key",
                 "customerManaged": "Use customer-provided encryption key"
             },
             "groupName": "serverSideEncryption"
@@ -99,7 +99,7 @@
             "label": "Customer Key",
             "required": false,
             "defaultValue": "",
-            "helpMarkDown": "Hex-encoded string representing the encryption key for Oracle S3 to use in decrypting data. This value is used to decrypt the object and then is discarded; Oracle does not store the encryption key. This value must be appropriate for use with the AES256 encryption algorithm used for encryption when customer managed keys are selected.\n\nRequired when Encryption Key Management is set to *Use customer-provided encryption key*.",
+            "helpMarkDown": "Hex-encoded string representing the encryption key for Oracle BlockStorage to use in decrypting data. This value is used to decrypt the object and then is discarded; Oracle does not store the encryption key. This value must be appropriate for use with the AES256 encryption algorithm used for encryption when customer managed keys are selected.\n\nRequired when Encryption Key Management is set to *Use customer-provided encryption key*.",
             "groupName": "serverSideEncryption",
             "visibleRule": "keyManagement = customerManaged"
         },
@@ -166,6 +166,6 @@
         "MatchedKey": "...matched key %s",
         "DownloadingFiles": "Downloading files from %s in bucket %s to %s",
         "BucketNotExist": "Bucket %s does not exist",
-        "TaskCompleted": "Downloads from S3 completed"
+        "TaskCompleted": "Downloads from BlockStorage completed"
     }
 }

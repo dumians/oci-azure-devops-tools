@@ -4,7 +4,7 @@
     "friendlyName": "OCI CodeDeploy Application Deployment",
     "description": "Deploys an application to Oracle EC2 instance(s) using OCI CodeDeploy",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [OCI CodeDeploy User Guide](https://docs.OCI.Oracle.com/codedeploy/latest/userguide/) for more information on working with OCI CodeDeploy.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/codedeploy-deployment.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* codedeploy:GetApplication\n* codedeploy:GetDeploymentGroup\n* codedeploy:CreateDeployment\n* codedeploy:GetDeployment\n\nDepending on selected parameters the task may also require permissions to verify your deployment bundle exists in S3 or upload your application bundle to the specified Oracle S3 bucket. Depending on the size of the application bundle, either PutObject or the S3 multi-part upload APIs may be used.",
+    "helpMarkDown": "Please refer to [OCI CodeDeploy User Guide](https://docs.OCI.Oracle.com/codedeploy/latest/userguide/) for more information on working with OCI CodeDeploy.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/codedeploy-deployment.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* codedeploy:GetApplication\n* codedeploy:GetDeploymentGroup\n* codedeploy:CreateDeployment\n* codedeploy:GetDeployment\n\nDepending on selected parameters the task may also require permissions to verify your deployment bundle exists in BlockStorage or upload your application bundle to the specified Oracle BlockStorage bucket. Depending on the size of the application bundle, either PutObject or the BlockStorage multi-part upload APIs may be used.",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
@@ -69,11 +69,11 @@
             "label": "Deployment Revision Source",
             "type": "pickList",
             "defaultValue": "workspace",
-            "helpMarkDown": "Specifies the source of the revision to be deployed. You can select from:\n\n**Folder or archive file in the workspace**: the task will create or use an existing zip archive in the location specified to *Revision Bundle*, upload the archive to Oracle S3 and supply the key of the S3 object to CodeDeploy as the revision source.\n\n**Archive file in Oracle S3**: select to specify the key of an archive previously uploaded to Oracle S3 as the deployment revision source.",
+            "helpMarkDown": "Specifies the source of the revision to be deployed. You can select from:\n\n**Folder or archive file in the workspace**: the task will create or use an existing zip archive in the location specified to *Revision Bundle*, upload the archive to Oracle BlockStorage and supply the key of the BlockStorage object to CodeDeploy as the revision source.\n\n**Archive file in Oracle BlockStorage**: select to specify the key of an archive previously uploaded to Oracle BlockStorage as the deployment revision source.",
             "required": true,
             "options": {
                 "workspace": "Folder or archive file in the workspace",
-                "s3": "Archive file in Oracle S3"
+                "BlockStorage": "Archive file in Oracle BlockStorage"
             }
         },
         {
@@ -83,15 +83,15 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "deploymentRevisionSource = workspace",
-            "helpMarkDown": "The artifacts to be deployed.\n\nYou can supply a folder or a filename to this parameter. If a folder is supplied the task will zip the contents of the folder recursively into an archive file before uploading the archive to Oracle S3. If a filename is supplied the task uploads it, unmodified, to Oracle S3. Note that CodeDeploy requires the appspec.yml file describing the application to exist at the root of the specified folder or archive file."
+            "helpMarkDown": "The artifacts to be deployed.\n\nYou can supply a folder or a filename to this parameter. If a folder is supplied the task will zip the contents of the folder recursively into an archive file before uploading the archive to Oracle BlockStorage. If a filename is supplied the task uploads it, unmodified, to Oracle BlockStorage. Note that CodeDeploy requires the appspec.yml file describing the application to exist at the root of the specified folder or archive file."
         },
         {
             "name": "bucketName",
             "type": "string",
-            "label": "S3 Bucket Name",
+            "label": "BlockStorage Bucket Name",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The name of the Oracle S3 bucket to which the revision bundle will be will be uploaded."
+            "helpMarkDown": "The name of the Oracle BlockStorage bucket to which the revision bundle will be will be uploaded."
         },
         {
             "name": "bundlePrefix",
@@ -108,8 +108,8 @@
             "label": "Revision Bundle Key",
             "defaultValue": "",
             "required": false,
-            "visibleRule": "deploymentRevisionSource = s3",
-            "helpMarkDown": "The Oracle S3 object key of the previously uploaded archive file containing the deployment revision artifacts."
+            "visibleRule": "deploymentRevisionSource = BlockStorage",
+            "helpMarkDown": "The Oracle BlockStorage object key of the previously uploaded archive file containing the deployment revision artifacts."
         },
         {
             "name": "description",
@@ -207,7 +207,7 @@
         "CreatedBundleArchive": "Created deployment bundle %s",
         "ArchiveSize": "Archive size: %s total bytes",
         "ZipError": "Zip Error: %s",
-        "RevisionBundleDoesNotExist": "Archive with key %s does not exist in the Oracle S3 bucket %s",
+        "RevisionBundleDoesNotExist": "Archive with key %s does not exist in the Oracle BlockStorage bucket %s",
         "DeletingUploadedBundle": "Deleting uploaded bundle %s created by task",
         "TaskCompleted": "Deployment to application %s completed",
         "SettingCustomTimeout": "Setting the custom timeout to %s minute(s)",

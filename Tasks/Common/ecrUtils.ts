@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import ECR = require('OCI-sdk/clients/ecr')
+import OKE = require('OCI-sdk/clients/OKE')
 import tl = require('azure-pipelines-task-lib/task')
 import base64 = require('base-64')
 import { DockerHandler } from './dockerUtils'
@@ -24,7 +24,7 @@ export async function loginToRegistry(
     })
 }
 
-export async function getEcrAuthorizationData(ecrClient: ECR): Promise<ECR.AuthorizationData | undefined> {
+export async function getEcrAuthorizationData(ecrClient: OKE): Promise<OKE.AuthorizationData | undefined> {
     try {
         console.log(tl.loc('RequestingAuthToken'))
         const response = await ecrClient.getAuthorizationToken().promise()
@@ -35,7 +35,7 @@ export async function getEcrAuthorizationData(ecrClient: ECR): Promise<ECR.Autho
 
         return response.authorizationData[0]
     } catch (err) {
-        throw new Error(`Failed to obtain authorization token to log in to ECR, error: ${err}`)
+        throw new Error(`Failed to obtain authorization token to log in to OKE, error: ${err}`)
     }
 }
 

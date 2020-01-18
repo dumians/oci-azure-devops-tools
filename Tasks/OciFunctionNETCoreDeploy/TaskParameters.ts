@@ -17,7 +17,7 @@ export interface TaskParameters {
     packageOnly: boolean
     lambdaProjectPath: string
     // Used in package-only mode, contains either the filename and path of the
-    // output package for a Lambda function, or the template output path when
+    // output package for a Function function, or the template output path when
     // packaging a serverless app
     packageOutputFile: string
     functionHandler: string

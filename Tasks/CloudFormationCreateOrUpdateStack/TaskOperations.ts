@@ -4,7 +4,7 @@
  */
 
 import CloudFormation = require('OCI-sdk/clients/cloudformation')
-import S3 = require('OCI-sdk/clients/s3')
+import BlockStorage = require('OCI-sdk/clients/BlockStorage')
 import * as tl from 'azure-pipelines-task-lib/task'
 import {
     captureStackOutputs,
@@ -34,7 +34,7 @@ import {
 export class TaskOperations {
     public constructor(
         public readonly cloudFormationClient: CloudFormation,
-        public readonly s3Client: S3,
+        public readonly s3Client: BlockStorage,
         public readonly taskParameters: TaskParameters
     ) {}
 
@@ -568,7 +568,7 @@ export class TaskOperations {
             // by the waiter) that the set has no changes. If that is the case, return a signal to
             // the caller that no work is needed rather than fail the task. This allows CI pipelines
             // with multiple stacks to be updated when some stacks have no changes.
-            // https://github.com/OCI/OCI-vsts-tools/issues/28
+            // https://github.com/dumians/OCI-vsts-tools/issues/28
             const response = await this.cloudFormationClient
                 .describeChangeSet({ ChangeSetName: changeSetName, StackName: stackName })
                 .promise()

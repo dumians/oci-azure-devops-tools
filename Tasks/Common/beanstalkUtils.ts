@@ -6,7 +6,7 @@
 import * as tl from 'azure-pipelines-task-lib/task'
 
 import archiver = require('archiver')
-import { ElasticBeanstalk, S3 } from 'OCI-sdk/clients/all'
+import { ElasticBeanstalk, BlockStorage } from 'OCI-sdk/clients/all'
 import fs = require('fs')
 import path = require('path')
 import Q = require('q')
@@ -102,7 +102,7 @@ export class BeanstalkUtils {
     }
 
     public static async uploadBundle(
-        s3Client: S3,
+        s3Client: BlockStorage,
         applicationBundlePath: string,
         bucketName: string,
         objectKey: string
@@ -110,7 +110,7 @@ export class BeanstalkUtils {
         console.log(tl.loc('UploadingBundle', applicationBundlePath, objectKey, bucketName))
         const fileBuffer = fs.createReadStream(applicationBundlePath)
         try {
-            const response: S3.ManagedUpload.SendData = await s3Client
+            const response: BlockStorage.ManagedUpload.SendData = await s3Client
                 .upload({
                     Bucket: bucketName,
                     Key: objectKey,

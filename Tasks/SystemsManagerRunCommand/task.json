@@ -23,7 +23,7 @@
         },
         {
             "name": "output",
-            "displayName": "S3 Output",
+            "displayName": "BlockStorage Output",
             "isExpanded": false
         },
         {
@@ -202,21 +202,21 @@
         },
         {
             "name": "outputS3BucketName",
-            "label": "S3 Bucket Name",
+            "label": "BlockStorage Bucket Name",
             "type": "string",
             "required": false,
             "defaultValue": "",
             "groupName": "output",
-            "helpMarkDown": "The name of the Amzon S3 bucket where command execution responses should be stored."
+            "helpMarkDown": "The name of the Amzon BlockStorage bucket where command execution responses should be stored."
         },
         {
             "name": "outputS3KeyPrefix",
-            "label": "S3 Key Prefix",
+            "label": "BlockStorage Key Prefix",
             "type": "string",
             "required": false,
             "defaultValue": "",
             "groupName": "output",
-            "helpMarkDown": "The key prefix (folder structure) within the S3 bucket where the S3 objeccts containing the responses should be stored."
+            "helpMarkDown": "The key prefix (folder structure) within the BlockStorage bucket where the BlockStorage objeccts containing the responses should be stored."
         },
         {
             "name": "commandIdOutputVariable",

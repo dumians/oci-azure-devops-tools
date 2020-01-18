@@ -10,20 +10,12 @@
         "returnType": "number"
     },
     {
-        "taskName": "BeanstalkCreateApplicationVersion",
-        "taskClients": ["Beanstalk", "S3"]
-    },
-    {
-        "taskName": "BeanstalkDeployApplication",
-        "taskClients": ["Beanstalk", "S3"]
-    },
-    {
         "taskName": "CodeDeployDeployApplication",
-        "taskClients": ["CodeDeploy", "S3"]
+        "taskClients": ["CodeDeploy", "BlockStorage"]
     },
     {
         "taskName": "CloudFormationCreateOrUpdateStack",
-        "taskClients": ["CloudFormation", "S3"]
+        "taskClients": ["CloudFormation", "BlockStorage"]
     },
     {
         "taskName": "CloudFormationDeleteStack",
@@ -34,48 +26,48 @@
         "taskClients": ["CloudFormation"]
     },
     {
-        "taskName": "ECRPullImage",
-        "taskClients": ["ECR"],
+        "taskName": "OKEPullImage",
+        "taskClients": ["OKE"],
         "additionalImports": ["import { locateDockerExecutable, runDockerCommand } from 'Common/dockerUtils'"],
         "additionalArguments": [
             "{ runDockerCommand: runDockerCommand, locateDockerExecutable: locateDockerExecutable }"
         ]
     },
     {
-        "taskName": "ECRPushImage",
-        "taskClients": ["ECR"],
+        "taskName": "OKEPushImage",
+        "taskClients": ["OKE"],
         "additionalImports": ["import { locateDockerExecutable, runDockerCommand } from 'Common/dockerUtils'"],
         "additionalArguments": [
             "{ runDockerCommand: runDockerCommand, locateDockerExecutable: locateDockerExecutable }"
         ]
     },
     {
-        "taskName": "LambdaDeployFunction",
-        "taskClients": ["IAM", "Lambda"]
+        "taskName": "FunctionDeployFunction",
+        "taskClients": ["IAM", "Function"]
     },
     {
-        "taskName": "LambdaInvokeFunction",
-        "taskClients": ["Lambda"]
+        "taskName": "FunctionInvokeFunction",
+        "taskClients": ["Function"]
     },
     {
-        "taskName": "LambdaNETCoreDeploy",
+        "taskName": "FunctionNETCoreDeploy",
         "additionalImports": ["import { getCredentials } from 'Common/OCIConnectionParameters'"],
         "additionalSetupStatements": ["process.env.OCI_EXECUTION_ENV = 'VSTS-LambdaNETCoreDeploy'"],
         "additionalArguments": [
             "await getCredentials(taskParameters.OCIConnectionParameters)",
             "tl.which('dotnet', true)",
-            "'dotnet-lambda'"
+            "'dotnet-Function'"
         ]
     },
     {
         "taskName": "S3Download",
-        "taskClients": ["S3"]
+        "taskClients": ["BlockStorage"]
     },
     {
         "taskName": "S3Upload",
         "additionalImports": ["import { getRegion } from 'Common/OCIConnectionParameters'"],
         "additionalArguments": ["await getRegion()"],
-        "taskClients": ["S3"]
+        "taskClients": ["BlockStorage"]
     },
     {
         "taskName": "SecretsManagerCreateOrUpdateSecret",
@@ -85,10 +77,7 @@
         "taskName": "SecretsManagerGetSecret",
         "taskClients": ["SecretsManager"]
     },
-    {
-        "taskName": "SendMessage",
-        "taskClients": ["SNS", "SQS"]
-    },
+
     {
         "taskName": "SystemsManagerGetParameter",
         "taskClients": ["SSM"]

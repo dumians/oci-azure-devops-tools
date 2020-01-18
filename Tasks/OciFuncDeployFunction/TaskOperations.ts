@@ -4,7 +4,7 @@
  */
 
 import IAM = require('OCI-sdk/clients/iam')
-import Lambda = require('OCI-sdk/clients/lambda')
+import Function = require('OCI-sdk/clients/Function')
 import * as tl from 'azure-pipelines-task-lib/task'
 import { SdkUtils } from 'Common/sdkutils'
 import { readFileSync } from 'fs'
@@ -13,7 +13,7 @@ import { deployCodeAndConfig, deployCodeOnly, TaskParameters, updateFromLocalFil
 export class TaskOperations {
     public constructor(
         public readonly iamClient: IAM,
-        public readonly lambdaClient: Lambda,
+        public readonly lambdaClient: Function,
         public readonly taskParameters: TaskParameters
     ) {}
 
@@ -53,7 +53,7 @@ export class TaskOperations {
         console.log(tl.loc('UpdatingFunctionCode', this.taskParameters.functionName))
 
         try {
-            const updateCodeRequest: Lambda.UpdateFunctionCodeRequest = {
+            const updateCodeRequest: Function.UpdateFunctionCodeRequest = {
                 FunctionName: this.taskParameters.functionName,
                 Publish: this.taskParameters.publish
             }
@@ -83,7 +83,7 @@ export class TaskOperations {
         // Cannot update code and configuration at the same time. As 'publish' option is
         // only available when updating the code, do that last
         try {
-            const updateConfigRequest: Lambda.UpdateFunctionConfigurationRequest = {
+            const updateConfigRequest: Function.UpdateFunctionConfigurationRequest = {
                 FunctionName: this.taskParameters.functionName,
                 Handler: this.taskParameters.functionHandler,
                 Role: await SdkUtils.roleArnFromName(this.iamClient, this.taskParameters.roleARN),
@@ -125,10 +125,10 @@ export class TaskOperations {
             }
 
             // Update tags if we have them
-            const tags = SdkUtils.getTagsDictonary<Lambda.Tags>(this.taskParameters.tags)
+            const tags = SdkUtils.getTagsDictonary<Function.Tags>(this.taskParameters.tags)
             if (tags && Object.keys(tags).length > 0) {
                 try {
-                    const tagRequest: Lambda.TagResourceRequest = {
+                    const tagRequest: Function.TagResourceRequest = {
                         Resource: response.FunctionArn,
                         Tags: tags
                     }
@@ -147,7 +147,7 @@ export class TaskOperations {
     private async createFunction(): Promise<string> {
         console.log(tl.loc('CreatingFunction', this.taskParameters.functionName))
 
-        const request: Lambda.CreateFunctionRequest = {
+        const request: Function.CreateFunctionRequest = {
             FunctionName: this.taskParameters.functionName,
             Handler: this.taskParameters.functionHandler,
             Role: await SdkUtils.roleArnFromName(this.iamClient, this.taskParameters.roleARN),

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { S3 } from 'OCI-sdk'
+import { BlockStorage } from 'OCI-sdk'
 import { SdkUtils } from 'Common/sdkutils'
 import { TaskOperations } from '../../../Tasks/S3Upload/TaskOperations'
 import { TaskParameters } from '../../../Tasks/S3Upload/TaskParameters'
@@ -55,22 +55,22 @@ const validateUpload = {
     }
 }
 
-describe('S3 Upload', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+describe('BlockStorage Upload', () => {
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/S3Upload/task.json')
     })
 
     test('Creates a TaskOperation', () => {
         const taskParameters = baseTaskParameters
-        expect(new TaskOperations(new S3(), '', taskParameters)).not.toBeNull()
+        expect(new TaskOperations(new BlockStorage(), '', taskParameters)).not.toBeNull()
     })
 
     test('Handles bucket not existing (and not being able to create one)', async () => {
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn()(() => headBucketResponseFails)
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn()(() => headBucketResponseFails)
         const taskParameters = baseTaskParameters
-        const taskOperation = new TaskOperations(s3, '', taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         expect.assertions(1)
         await taskOperation.execute().catch(e => {
             expect(e.message).toContain('not exist')
@@ -78,13 +78,13 @@ describe('S3 Upload', () => {
     })
 
     test('Tries and fails to create bucket when told to', async () => {
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn(() => headBucketResponseFails)
-        s3.createBucket = jest.fn(() => createBucketResponse)
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn(() => headBucketResponseFails)
+        BlockStorage.createBucket = jest.fn(() => createBucketResponse)
         const taskParameters = { ...baseTaskParameters }
         taskParameters.createBucket = true
         taskParameters.bucketName = 'potato'
-        const taskOperation = new TaskOperations(s3, '', taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         expect.assertions(1)
         await taskOperation.execute().catch(e => {
             expect(e.message).toContain('create called')
@@ -92,36 +92,36 @@ describe('S3 Upload', () => {
     })
 
     test('Finds matching files', () => {
-        const s3 = new S3({ region: 'us-east-1' })
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' })
         const taskParameters = { ...baseTaskParameters }
         taskParameters.bucketName = 'potato'
         taskParameters.sourceFolder = __dirname
         taskParameters.globExpressions = ['*.ts']
-        const taskOperation = new TaskOperations(s3, '', taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         const results = taskOperation.findMatchingFiles(taskParameters)
         // expect it to find this file only
         expect(results.length).toBe(1)
     })
 
     test('No matching files found', async () => {
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn(() => headBucketResponse)
-        s3.upload = jest.fn((params: S3.PutObjectRequest) => {
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn(() => headBucketResponse)
+        BlockStorage.upload = jest.fn((params: BlockStorage.PutObjectRequest) => {
             throw new Error('should not be called')
         })
         const taskParameters = { ...baseTaskParameters }
         taskParameters.createBucket = true
         taskParameters.sourceFolder = __dirname
         taskParameters.globExpressions = ['*.js']
-        const taskOperation = new TaskOperations(s3, '', taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         await taskOperation.execute()
     })
 
     test('Happy path uploads a found file', async () => {
         expect.assertions(5)
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn(() => headBucketResponse)
-        s3.upload = jest.fn((params: S3.PutObjectRequest) => {
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn(() => headBucketResponse)
+        BlockStorage.upload = jest.fn((params: BlockStorage.PutObjectRequest) => {
             expect(params.Bucket).toBe('potato')
             expect(params.Key).toContain('ts')
             expect(params.ContentEncoding).toBe('gzip')
@@ -136,16 +136,16 @@ describe('S3 Upload', () => {
         taskParameters.globExpressions = ['*.ts']
         taskParameters.contentEncoding = 'gzip'
         taskParameters.contentType = 'application/json'
-        const taskOperation = new TaskOperations(s3, '', taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         await taskOperation.execute()
-        expect(s3.upload.mock.calls.length).toBe(1)
+        expect(BlockStorage.upload.mock.calls.length).toBe(1)
     })
 
     test('Cache control works', async () => {
         expect.assertions(1)
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn(() => headBucketResponse)
-        s3.upload = jest.fn((params: S3.PutObjectRequest) => {
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn(() => headBucketResponse)
+        BlockStorage.upload = jest.fn((params: BlockStorage.PutObjectRequest) => {
             expect(params.CacheControl).toBe('public')
 
             return validateUpload
@@ -155,15 +155,15 @@ describe('S3 Upload', () => {
         taskParameters.sourceFolder = __dirname
         taskParameters.globExpressions = ['*.ts']
         taskParameters.cacheControl = ['*.ts=public']
-        const taskOperation = new TaskOperations(s3, '', taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         await taskOperation.execute()
     })
 
     test("Cache control doesn't match", async () => {
         expect.assertions(1)
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn(() => headBucketResponse)
-        s3.upload = jest.fn((params: S3.PutObjectRequest) => {
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn(() => headBucketResponse)
+        BlockStorage.upload = jest.fn((params: BlockStorage.PutObjectRequest) => {
             expect(params.CacheControl).toBeUndefined()
 
             return validateUpload
@@ -173,26 +173,26 @@ describe('S3 Upload', () => {
         taskParameters.sourceFolder = __dirname
         taskParameters.globExpressions = ['*.ts']
         taskParameters.cacheControl = ['*.js=public']
-        const taskOperation = new TaskOperations(s3, '', taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         await taskOperation.execute()
     })
 
     test('Cache control invalid expression fails', async () => {
         expect.assertions(2)
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn(() => headBucketResponse)
-        s3.upload = jest.fn(() => validateUpload)
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn(() => headBucketResponse)
+        BlockStorage.upload = jest.fn(() => validateUpload)
         const taskParameters = { ...baseTaskParameters }
         taskParameters.createBucket = true
         taskParameters.sourceFolder = __dirname
         taskParameters.globExpressions = ['*.ts']
         taskParameters.cacheControl = ['*.js=']
-        let taskOperation = new TaskOperations(s3, '', taskParameters)
+        let taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         await taskOperation.execute().catch(e => {
             expect(e.message).toContain('Invalid match expression *.js=')
         })
         taskParameters.cacheControl = ['=false']
-        taskOperation = new TaskOperations(s3, '', taskParameters)
+        taskOperation = new TaskOperations(BlockStorage, '', taskParameters)
         await taskOperation.execute().catch(e => {
             expect(e.message).toContain('Invalid match expression =false')
         })

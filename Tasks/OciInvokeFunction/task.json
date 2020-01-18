@@ -1,15 +1,15 @@
 {
     "id": "c9e49f96-6c7d-4420-97f1-5e0dfd816354",
     "name": "LambdaInvokeFunction",
-    "friendlyName": "OCI Lambda Invoke Function",
-    "description": "Invokes an OCI Lambda function",
+    "friendlyName": "OCI Function Invoke Function",
+    "description": "Invokes an OCI Function function",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [OCI Lambda Developer Guide](https://docs.OCI.Oracle.com/lambda/latest/dg/) for more information on working with OCI Lambda.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/lambda-invoke.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* lambda:GetFunctionConfiguration\n* lambda:InvokeFunction",
+    "helpMarkDown": "Please refer to [OCI Function Developer Guide](https://docs.OCI.Oracle.com/Function/latest/dg/) for more information on working with OCI Function.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/Function-invoke.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* Function:GetFunctionConfiguration\n* Function:InvokeFunction",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
     "minimumAgentVersion": "1.91.0",
-    "instanceNameFormat": "Invoke Lambda Function: $(functionName)",
+    "instanceNameFormat": "Invoke Function Function: $(functionName)",
     "groups": [
         {
             "name": "OutputOptions",
@@ -50,7 +50,7 @@
             "label": "Function Name",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The name of the Lambda function to invoke. You can also specify the Oracle Resource Name (ARN) of the function."
+            "helpMarkDown": "The name of the Function function to invoke. You can also specify the Oracle Resource Name (ARN) of the function."
         },
         {
             "name": "payload",
@@ -83,7 +83,7 @@
             "type": "pickList",
             "label": "Log Type",
             "defaultValue": "None",
-            "helpMarkDown": "For synchronous execution, returns the base64-encoded last 4 KB of log data produced by your Lambda function in the x-amz-log-result header.",
+            "helpMarkDown": "For synchronous execution, returns the base64-encoded last 4 KB of log data produced by your Function function in the x-amz-log-result header.",
             "groupName": "OutputOptions",
             "options": {
                 "None": "None",
@@ -121,6 +121,6 @@
         "SettingOutputVariable": "Setting output variable %s with the function output",
         "ReceivedOutput": "Received output %s from function",
         "FunctionDoesNotExist": "Function %s does not exist",
-        "TaskCompleted": "Completed invocation of Lambda function %s"
+        "TaskCompleted": "Completed invocation of Function function %s"
     }
 }

@@ -13,7 +13,7 @@
     ],
     "variables": {
         "system.debug": { "value": "false", "allowOverride": true },
-        "targetFolder": { "value": "s3/uploadcontent-withcreds", "allowOverride": true }
+        "targetFolder": { "value": "BlockStorage/uploadcontent-withcreds", "allowOverride": true }
     },
     "jobAuthorizationScope": 1,
     "jobTimeoutInMinutes": 60,
@@ -78,7 +78,7 @@
                             "arguments": "\"$(bucketName)\" \"$(targetFolder)\"",
                             "scriptType": "inline",
                             "filePath": "",
-                            "inlineScript": "Param (\n [string]$bucketName,\n [string]$targetFolder\n)\n\n$keysToTest = @(\n 's3/uploadcontent-withcreds/WebApplication1/Content/bootstrap-theme.css'\n 's3/uploadcontent-withcreds/WebApplication1/Scripts/jquery.validate-vsdoc.js'\n 's3/uploadcontent-withcreds/WebApplication1/Views/Shared/Error.cshtml'\n 's3/uploadcontent-withcreds/WebApplication1/Web.Debug.config'\n 's3/uploadcontent-withcreds/WebApplication1/fonts/glyphicons-halflings-regular.woff'\n 's3/uploadcontent-withcreds/WebApplication1/packages.config'\n)\n\nWrite-Host \"Retrieving object keys to validate from $targetFolder in bucket $bucketName\"\n$keys = Get-S3Object -BucketName $bucketName -KeyPrefix $targetFolder | Select-Object -Property Key\n\nif ($keys)\n{\n Write-Host \"PASS! Retrieved $($keys.Count) keys\"\n\n Write-Host \"...performing spot-check on a subset of keys\"\n $keysToTest | % { if (!($keys.Key.Contains($_))) { throw \"FAIL! Returned keys did not contain $_\" } }\n Write-Host \"PASS! All expected keys found\"\n}\nelse\n{\n throw \"FAIL! Did not recover any keys from the target key prefix\"\n}",
+                            "inlineScript": "Param (\n [string]$bucketName,\n [string]$targetFolder\n)\n\n$keysToTest = @(\n 'BlockStorage/uploadcontent-withcreds/WebApplication1/Content/bootstrap-theme.css'\n 'BlockStorage/uploadcontent-withcreds/WebApplication1/Scripts/jquery.validate-vsdoc.js'\n 'BlockStorage/uploadcontent-withcreds/WebApplication1/Views/Shared/Error.cshtml'\n 'BlockStorage/uploadcontent-withcreds/WebApplication1/Web.Debug.config'\n 'BlockStorage/uploadcontent-withcreds/WebApplication1/fonts/glyphicons-halflings-regular.woff'\n 'BlockStorage/uploadcontent-withcreds/WebApplication1/packages.config'\n)\n\nWrite-Host \"Retrieving object keys to validate from $targetFolder in bucket $bucketName\"\n$keys = Get-S3Object -BucketName $bucketName -KeyPrefix $targetFolder | Select-Object -Property Key\n\nif ($keys)\n{\n Write-Host \"PASS! Retrieved $($keys.Count) keys\"\n\n Write-Host \"...performing spot-check on a subset of keys\"\n $keysToTest | % { if (!($keys.Key.Contains($_))) { throw \"FAIL! Returned keys did not contain $_\" } }\n Write-Host \"PASS! All expected keys found\"\n}\nelse\n{\n throw \"FAIL! Did not recover any keys from the target key prefix\"\n}",
                             "errorActionPreference": "stop",
                             "failOnStderr": "false",
                             "ignoreLASTEXITCODE": "false",
@@ -143,7 +143,7 @@
     "quality": 1,
     "drafts": [],
     "id": 22,
-    "name": "s3-upload-assumerole-fullaccess",
+    "name": "BlockStorage-upload-assumerole-fullaccess",
     "path": "\\",
     "type": 2,
     "queueStatus": 0,

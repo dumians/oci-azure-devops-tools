@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as S3 from 'OCI-sdk/clients/s3'
+import * as BlockStorage from 'OCI-sdk/clients/BlockStorage'
 import * as tl from 'azure-pipelines-task-lib/task'
-import { knownMimeTypes, testBucketExists } from 'Common/s3'
+import { knownMimeTypes, testBucketExists } from 'Common/BlockStorage'
 import * as fs from 'fs'
 import * as path from 'path'
 import {
@@ -17,7 +17,7 @@ import {
 
 export class TaskOperations {
     public constructor(
-        public readonly s3Client: S3,
+        public readonly s3Client: BlockStorage,
         public readonly region: string,
         public readonly taskParameters: TaskParameters
     ) {}
@@ -39,7 +39,7 @@ export class TaskOperations {
     public findMatchingFiles(taskParameters: TaskParameters): string[] {
         console.log(`Searching ${taskParameters.sourceFolder} for files to upload`)
         taskParameters.sourceFolder = path.normalize(taskParameters.sourceFolder)
-        // Follows sym links, but is currently broken: https://github.com/OCI/OCI-vsts-tools/issues/178
+        // Follows sym links, but is currently broken: https://github.com/dumians/OCI-vsts-tools/issues/178
         const allPaths = tl.find(taskParameters.sourceFolder)
         tl.debug(tl.loc('AllPaths', allPaths))
         const matchedPaths = tl.match(allPaths, taskParameters.globExpressions, taskParameters.sourceFolder)
@@ -84,7 +84,7 @@ export class TaskOperations {
         return ''
     }
 
-    private buildS3Request(request: S3.PutObjectRequest, matchedFile: string) {
+    private buildS3Request(request: BlockStorage.PutObjectRequest, matchedFile: string) {
         if (this.taskParameters.contentEncoding) {
             request.ContentEncoding = this.taskParameters.contentEncoding
         }
@@ -182,7 +182,7 @@ export class TaskOperations {
                     }
                     console.log(tl.loc('UploadingFile', matchedFile, contentType))
 
-                    const request: S3.PutObjectRequest = {
+                    const request: BlockStorage.PutObjectRequest = {
                         Bucket: this.taskParameters.bucketName,
                         Key: targetPath,
                         Body: fileBuffer,

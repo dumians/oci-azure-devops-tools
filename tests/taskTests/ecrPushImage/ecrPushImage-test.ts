@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { ECR } from 'OCI-sdk'
+import { OKE } from 'OCI-sdk'
 import { DockerHandler } from 'Common/dockerUtils'
 import { SdkUtils } from 'Common/sdkutils'
 import { TaskOperations } from '../../../Tasks/ECRPushImage/TaskOperations'
@@ -28,7 +28,7 @@ const defaultTaskParameters: TaskParameters = {
 
 const defaultDocker: DockerHandler = {
     locateDockerExecutable: async () => '',
-    runDockerCommand: async (s1, s2, s3) => undefined
+    runDockerCommand: async (s1, s2, BlockStorage) => undefined
 }
 
 const ecrFail = {
@@ -56,14 +56,14 @@ const ecrReturnsToken = {
     }
 }
 
-describe('ECR Push image', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+describe('OKE Push image', () => {
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/ECRPushImage/task.json')
     })
 
     test('Creates a TaskOperation', () => {
-        expect(new TaskOperations(new ECR(), defaultDocker, defaultTaskParameters)).not.toBeNull()
+        expect(new TaskOperations(new OKE(), defaultDocker, defaultTaskParameters)).not.toBeNull()
     })
 
     test('Fails when docker executable is failed to be located', async () => {
@@ -72,29 +72,29 @@ describe('ECR Push image', () => {
         dockerHandler.locateDockerExecutable = () => {
             throw new Error('docker not found')
         }
-        const taskOperations = new TaskOperations(new ECR(), dockerHandler, defaultTaskParameters)
+        const taskOperations = new TaskOperations(new OKE(), dockerHandler, defaultTaskParameters)
         await taskOperations.execute().catch(e => expect(`${e}`).toContain('docker not found'))
     })
 
     test('Fails on failed auth', async () => {
         expect.assertions(2)
-        const ecr = new ECR() as any
-        ecr.getAuthorizationToken = jest.fn(() => ecrFail)
-        const taskOperations = new TaskOperations(ecr, defaultDocker, defaultTaskParameters)
+        const OKE = new OKE() as any
+        OKE.getAuthorizationToken = jest.fn(() => ecrFail)
+        const taskOperations = new TaskOperations(OKE, defaultDocker, defaultTaskParameters)
         await taskOperations.execute().catch(e => expect(`${e}`).toContain('Failed to obtain'))
-        expect(ecr.getAuthorizationToken).toBeCalledTimes(1)
+        expect(OKE.getAuthorizationToken).toBeCalledTimes(1)
     })
 
     test('Runs docker commands', async () => {
         expect.assertions(5)
-        const ecr = new ECR() as any
-        ecr.getAuthorizationToken = jest.fn(() => ecrReturnsToken)
+        const OKE = new OKE() as any
+        OKE.getAuthorizationToken = jest.fn(() => ecrReturnsToken)
         const dockerHandler = { ...defaultDocker }
         const runDockerCommand = jest.fn(async (thing1, thing2, thing3) => undefined)
         dockerHandler.runDockerCommand = runDockerCommand
-        const taskOperations = new TaskOperations(ecr, dockerHandler, defaultTaskParameters)
+        const taskOperations = new TaskOperations(OKE, dockerHandler, defaultTaskParameters)
         await taskOperations.execute()
-        expect(ecr.getAuthorizationToken).toBeCalledTimes(1)
+        expect(OKE.getAuthorizationToken).toBeCalledTimes(1)
         expect(runDockerCommand).toBeCalledTimes(3)
         expect(runDockerCommand.mock.calls[0][1]).toBe('tag')
         expect(runDockerCommand.mock.calls[1][1]).toBe('login')
@@ -103,10 +103,10 @@ describe('ECR Push image', () => {
 
     test('autocreate creates repository', async () => {
         expect.assertions(3)
-        const ecr = new ECR() as any
-        ecr.getAuthorizationToken = jest.fn(() => ecrReturnsToken)
-        ecr.describeRepositories = jest.fn(() => ecrFailNotFound)
-        ecr.createRepository = jest.fn(args => {
+        const OKE = new OKE() as any
+        OKE.getAuthorizationToken = jest.fn(() => ecrReturnsToken)
+        OKE.describeRepositories = jest.fn(() => ecrFailNotFound)
+        OKE.createRepository = jest.fn(args => {
             expect(args.repositoryName).toBe('name')
 
             return ecrReturnsToken
@@ -114,10 +114,10 @@ describe('ECR Push image', () => {
         const taskParameters = { ...defaultTaskParameters }
         taskParameters.autoCreateRepository = true
         taskParameters.repositoryName = 'name'
-        const taskOperations = new TaskOperations(ecr, defaultDocker, taskParameters)
+        const taskOperations = new TaskOperations(OKE, defaultDocker, taskParameters)
         await taskOperations.execute()
-        expect(ecr.getAuthorizationToken).toBeCalledTimes(1)
-        expect(ecr.describeRepositories).toBeCalledTimes(1)
+        expect(OKE.getAuthorizationToken).toBeCalledTimes(1)
+        expect(OKE.describeRepositories).toBeCalledTimes(1)
     })
 
     test('Happy path', async () => {
@@ -125,18 +125,18 @@ describe('ECR Push image', () => {
         const dockerHandler = { ...defaultDocker }
         const runDockerCommand = jest.fn(async (thing1, thing2, thing3) => undefined)
         dockerHandler.runDockerCommand = runDockerCommand
-        const ecr = new ECR() as any
-        ecr.getAuthorizationToken = jest.fn(() => ecrReturnsToken)
-        ecr.describeRepositories = jest.fn(() => ecrFailNotFound)
-        ecr.createRepository = jest.fn(args => ecrReturnsToken)
+        const OKE = new OKE() as any
+        OKE.getAuthorizationToken = jest.fn(() => ecrReturnsToken)
+        OKE.describeRepositories = jest.fn(() => ecrFailNotFound)
+        OKE.createRepository = jest.fn(args => ecrReturnsToken)
         const taskParameters = { ...defaultTaskParameters }
         taskParameters.autoCreateRepository = true
         taskParameters.repositoryName = 'name'
         taskParameters.imageSource = imageNameSource
-        const taskOperations = new TaskOperations(ecr, dockerHandler, taskParameters)
+        const taskOperations = new TaskOperations(OKE, dockerHandler, taskParameters)
         await taskOperations.execute()
-        expect(ecr.getAuthorizationToken).toBeCalledTimes(1)
-        expect(ecr.describeRepositories).toBeCalledTimes(1)
+        expect(OKE.getAuthorizationToken).toBeCalledTimes(1)
+        expect(OKE.describeRepositories).toBeCalledTimes(1)
         expect(runDockerCommand.mock.calls[0][2]).toStrictEqual(['', 'example.com/name'])
     })
 })

@@ -1,7 +1,7 @@
 {
     "name": "lambdanetcoredeploy",
     "version": "1.1.8",
-    "description": "Builds and deploys an OCI Lambda function.",
+    "description": "Builds and deploys an OCI Function function.",
     "main": "LambdaNETCoreDeploy.js",
     "author": "",
     "license": "MIT",

@@ -8,7 +8,7 @@ import { OCIConnectionParameters, buildConnectionParameters } from 'Common/OCICo
 import { getInputOrEmpty, getInputRequired } from 'Common/vstsUtils'
 
 export const revisionSourceFromWorkspace: string = 'workspace'
-export const revisionSourceFromS3: string = 's3'
+export const revisionSourceFromS3: string = 'BlockStorage'
 export const defaultTimeoutInMins: number = 30
 
 export interface TaskParameters {

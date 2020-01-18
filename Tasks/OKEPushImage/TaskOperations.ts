@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import ECR = require('OCI-sdk/clients/ecr')
+import OKE = require('OCI-sdk/clients/OKE')
 import tl = require('azure-pipelines-task-lib/task')
 import { DockerHandler } from 'Common/dockerUtils'
 import { constructTaggedImageName, getEcrAuthorizationData, loginToRegistry } from 'Common/ecrUtils'
@@ -14,7 +14,7 @@ export class TaskOperations {
     private dockerPath: string = ''
 
     public constructor(
-        public readonly ecrClient: ECR,
+        public readonly ecrClient: OKE,
         public readonly dockerHandler: DockerHandler,
         public readonly taskParameters: TaskParameters
     ) {}

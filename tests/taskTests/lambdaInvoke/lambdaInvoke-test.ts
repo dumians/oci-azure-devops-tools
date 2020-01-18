@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { Lambda } from 'OCI-sdk'
+import { Function } from 'OCI-sdk'
 import { SdkUtils } from 'Common/sdkutils'
 import { TaskOperations } from '../../../Tasks/LambdaInvokeFunction/TaskOperations'
 import { TaskParameters } from '../../../Tasks/LambdaInvokeFunction/TaskParameters'
@@ -40,30 +40,30 @@ const invokeLambdaSucceeds = {
     }
 }
 
-describe('Lambda Invoke', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+describe('Function Invoke', () => {
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/LambdaInvokeFunction/task.json')
     })
 
     test('Creates a TaskOperation', () => {
-        expect(new TaskOperations(new Lambda(), baseTaskParameters)).not.toBeNull()
+        expect(new TaskOperations(new Function(), baseTaskParameters)).not.toBeNull()
     })
 
-    test("Fails when lambda doesn't exist", async () => {
+    test("Fails when Function doesn't exist", async () => {
         expect.assertions(1)
-        const lambda = new Lambda() as any
-        lambda.getFunctionConfiguration = jest.fn(() => OCIResponseThrows)
-        const taskOperations = new TaskOperations(lambda, baseTaskParameters)
+        const Function = new Function() as any
+        Function.getFunctionConfiguration = jest.fn(() => OCIResponseThrows)
+        const taskOperations = new TaskOperations(Function, baseTaskParameters)
         await taskOperations.execute().catch(e => expect(`${e}`).toContain('coolfunction does not exist'))
     })
 
-    test('Fails when lambda invoke fails', async () => {
+    test('Fails when Function invoke fails', async () => {
         expect.assertions(1)
-        const lambda = new Lambda() as any
-        lambda.getFunctionConfiguration = jest.fn(() => getFunctionSucceeds)
-        lambda.invoke = jest.fn(() => OCIResponseThrows)
-        const taskOperations = new TaskOperations(lambda, baseTaskParameters)
+        const Function = new Function() as any
+        Function.getFunctionConfiguration = jest.fn(() => getFunctionSucceeds)
+        Function.invoke = jest.fn(() => OCIResponseThrows)
+        const taskOperations = new TaskOperations(Function, baseTaskParameters)
         // it re-throws the exception, so we check for that
         await taskOperations.execute().catch(e => expect(`${e}`).toContain('function nonexistent'))
     })
@@ -72,14 +72,14 @@ describe('Lambda Invoke', () => {
         expect.assertions(2)
         const taskParameters = { ...baseTaskParameters }
         taskParameters.outputVariable = 'LambdaInvokeResult'
-        const lambda = new Lambda() as any
-        lambda.getFunctionConfiguration = jest.fn(() => getFunctionSucceeds)
-        lambda.invoke = jest.fn(() => invokeLambdaSucceeds)
-        const taskOperations = new TaskOperations(lambda, taskParameters)
+        const Function = new Function() as any
+        Function.getFunctionConfiguration = jest.fn(() => getFunctionSucceeds)
+        Function.invoke = jest.fn(() => invokeLambdaSucceeds)
+        const taskOperations = new TaskOperations(Function, taskParameters)
         await taskOperations.execute()
-        const taskOperationsWithBase = new TaskOperations(lambda, baseTaskParameters)
+        const taskOperationsWithBase = new TaskOperations(Function, baseTaskParameters)
         await taskOperationsWithBase.execute()
-        expect(lambda.invoke).toBeCalledTimes(2)
-        expect(lambda.getFunctionConfiguration).toBeCalledTimes(2)
+        expect(Function.invoke).toBeCalledTimes(2)
+        expect(Function.getFunctionConfiguration).toBeCalledTimes(2)
     })
 })

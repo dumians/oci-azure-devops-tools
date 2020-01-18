@@ -81,7 +81,7 @@
     "quality": 1,
     "drafts": [],
     "id": 52,
-    "name": "ecr-push-image-should-fail-no-docker",
+    "name": "OKE-push-image-should-fail-no-docker",
     "path": "\\",
     "type": 2,
     "queueStatus": 0,

@@ -25,8 +25,8 @@ const baseTaskParameters: TaskParameters = {
     additionalArgs: ''
 }
 
-describe('Lambda NET Core Deploy', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+describe('Function NET Core Deploy', () => {
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         process.env.OCI_REGION = 'region'
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/LambdaNETCoreDeploy/task.json')

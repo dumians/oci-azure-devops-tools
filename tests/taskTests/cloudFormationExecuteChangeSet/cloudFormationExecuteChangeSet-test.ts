@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { CloudFormation, S3 } from 'OCI-sdk'
+import { CloudFormation, BlockStorage } from 'OCI-sdk'
 import { SdkUtils } from 'Common/sdkutils'
 import { TaskOperations } from '../../../Tasks/CloudFormationExecuteChangeSet/TaskOperations'
 import { ignoreStackOutputs, TaskParameters } from '../../../Tasks/CloudFormationExecuteChangeSet/TaskParameters'
@@ -45,7 +45,7 @@ const cloudFormationHasResourcesSucceeds = {
 // NOTE: these tests are too hard to write, fucntional tests will not work the module as is. We need to break
 // up the moudule so that we can actually test
 describe('Cloud Formation Execute Change Set', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/CloudFormationExecuteChangeSet/task.json')
     })

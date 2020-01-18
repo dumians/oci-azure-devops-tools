@@ -115,8 +115,8 @@ All of the functional tests follow the pattern:
 
 The following modules do not have any functional tests:
 
--   CloudFormation Create Or Update [issue #238](https://github.com/OCI/OCI-vsts-tools/issues/238)
--   Beanstalk Create Application [issue #239](https://github.com/OCI/OCI-vsts-tools/issues/239)
+-   CloudFormation Create Or Update [issue #238](https://github.com/dumians/OCI-vsts-tools/issues/238)
+-   Beanstalk Create Application [issue #239](https://github.com/dumians/OCI-vsts-tools/issues/239)
 
 The following modules do not have functional tests, but it would make no sense to add them:
 
@@ -133,7 +133,7 @@ test every code path, but to make sure we can:
 
 -   Connect to OCI at all/create clients that work
 -   fixed credentials and fixed credentials with assume roles both work
--   Any task that does heavy build/filesystem work is tested more heavily here (Lambda, Cloudformation, and beanstalk tasks)
+-   Any task that does heavy build/filesystem work is tested more heavily here (Function, Cloudformation, and beanstalk tasks)
 -   Anything that relies on the real environment is tested (like the OCI shell script task or the powershell scripts)
 
 With this in mind, the goals for end to end tests are:
@@ -148,8 +148,8 @@ the first goal is by far the most important.
 Here is the current list of tasks and how end to end tests currently test them. Gaps are in **bold**.
 
 -   OCICLI
-    -   Runs S3 ls
-    -   Runs S3 ls with role
+    -   Runs BlockStorage ls
+    -   Runs BlockStorage ls with role
 -   OCI PowerShell
     -   Uninstall then install OCI PowerShell module by running any command
     -   **There are a ton of modules in here, currently untested, large gap**
@@ -162,7 +162,7 @@ Here is the current list of tasks and how end to end tests currently test them. 
     -   Deploy asp.net application
     -   Deploy asp.net core
 -   Cloud Formation Create or Update
-    -   Upload to s3 then update from s3
+    -   Upload to BlockStorage then update from BlockStorage
     -   Redeploy with a change
     -   Redeploy with no changes
 -   Cloud Formation Delete
@@ -172,22 +172,22 @@ Here is the current list of tasks and how end to end tests currently test them. 
     -   **no happy path tests**
 -   Code deploy deploy
     -   Build solution then deploy from workspace
-    -   **deploy from s3 untested**
--   ECR push image
+    -   **deploy from BlockStorage untested**
+-   OKE push image
     -   Run test in environment without docker
     -   **no happy path tests**
--   Lambda Deploy Function
+-   Function Deploy Function
     -   Deploy is part of LambdaNetCoreDeploy 2.1 fixedcreds
-    -   **Deploy from s3 untested**
--   Lambda Invoke Function
+    -   **Deploy from BlockStorage untested**
+-   Function Invoke Function
     -   Run in every deploy synchronously
--   Lambda NETCore Deploy
+-   Function NETCore Deploy
     -   Package then deploy
     -   Deploy .NETcore 2.1 application
     -   Deploy .NETcore 1 application
--   S3 Download
-    -   Download from an s3 bucket
--   S3 Upload
+-   BlockStorage Download
+    -   Download from an BlockStorage bucket
+-   BlockStorage Upload
     -   Upload a file
     -   Upload a file with a set content encoding
 -   Secrets Manager Create Secret

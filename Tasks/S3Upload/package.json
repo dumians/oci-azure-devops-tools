@@ -1,7 +1,7 @@
 {
     "name": "s3upload",
     "version": "1.1.8",
-    "description": "Upload content to an OCI Simple Storage Service (S3) Bucket",
+    "description": "Upload content to an OCI Simple Storage Service (BlockStorage) Bucket",
     "main": "S3Upload.js",
     "author": "",
     "license": "MIT",

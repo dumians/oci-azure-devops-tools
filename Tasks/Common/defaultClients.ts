@@ -6,11 +6,11 @@
 import {
     CloudFormation,
     CodeDeploy,
-    ECR,
+    OKE,
     ElasticBeanstalk,
     IAM,
-    Lambda,
-    S3,
+    Function,
+    BlockStorage,
     SecretsManager,
     SNS,
     SQS,
@@ -78,17 +78,17 @@ export async function createDefaultCloudFormation(
 export async function createDefaultECR(
     configuration: GenericClientConfiguration,
     logger: (msg: string) => void
-): Promise<ECR> {
-    const ecrOpts: ECR.ClientConfiguration = {
+): Promise<OKE> {
+    const ecrOpts: OKE.ClientConfiguration = {
         apiVersion: '2015-09-21'
     }
 
     return (await SdkUtils.createAndConfigureSdkClient(
-        ECR,
+        OKE,
         ecrOpts,
         configuration.OCIConnectionParameters,
         logger
-    )) as ECR
+    )) as OKE
 }
 
 export async function createDefaultIAM(
@@ -110,24 +110,24 @@ export async function createDefaultIAM(
 export async function createDefaultLambda(
     configuration: GenericClientConfiguration,
     logger: (msg: string) => void
-): Promise<Lambda> {
-    const lambdaOpts: Lambda.ClientConfiguration = {
+): Promise<Function> {
+    const lambdaOpts: Function.ClientConfiguration = {
         apiVersion: '2015-03-31'
     }
 
     return (await SdkUtils.createAndConfigureSdkClient(
-        Lambda,
+        Function,
         lambdaOpts,
         configuration.OCIConnectionParameters,
         logger
-    )) as Lambda
+    )) as Function
 }
 
 export async function createDefaultS3(
     configuration: S3ClientConfiguration,
     logger: (msg: string) => void
-): Promise<S3> {
-    const s3Opts: S3.ClientConfiguration = {
+): Promise<BlockStorage> {
+    const s3Opts: BlockStorage.ClientConfiguration = {
         apiVersion: '2006-03-01'
     }
 
@@ -135,7 +135,7 @@ export async function createDefaultS3(
         s3Opts.s3ForcePathStyle = configuration.forcePathStyleAddressing
     }
 
-    return (await SdkUtils.createAndConfigureSdkClient(S3, s3Opts, configuration.OCIConnectionParameters, logger)) as S3
+    return (await SdkUtils.createAndConfigureSdkClient(BlockStorage, s3Opts, configuration.OCIConnectionParameters, logger)) as BlockStorage
 }
 
 export async function createDefaultSecretsManager(

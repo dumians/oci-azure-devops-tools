@@ -35,7 +35,7 @@ const promiseSucceeds = {
 }
 
 describe('Send Message', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/SendMessage/task.json')
     })

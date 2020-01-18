@@ -24,7 +24,7 @@
                         "enabled": true,
                         "continueOnError": false,
                         "alwaysRun": false,
-                        "displayName": "OCI CLI: s3",
+                        "displayName": "OCI CLI: BlockStorage",
                         "timeoutInMinutes": 0,
                         "condition": "succeeded()",
                         "refName": "OCICLI_1",
@@ -36,7 +36,7 @@
                         "inputs": {
                             "OCICredentials": "a386f3cf-a7bc-49b8-a2f5-f789cc772584",
                             "regionName": "us-west-2",
-                            "OCICommand": "s3",
+                            "OCICommand": "BlockStorage",
                             "OCISubCommand": "ls",
                             "OCIArguments": "",
                             "failOnStandardError": ""

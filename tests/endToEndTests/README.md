@@ -10,7 +10,7 @@ To use them on your own VSTS/Azure Devops instance, go to build and release then
 
 ## Variables You Might Have to Set
 
--   `BucketName` - Tasks that access S3 buckets require the variable `bucketName` to be set. This should be set globally, as none of the tasks stomp on each other.
+-   `BucketName` - Tasks that access BlockStorage buckets require the variable `bucketName` to be set. This should be set globally, as none of the tasks stomp on each other.
 -   `queueUrl` - Tasks that access SQS need a valid queue url
 -   `topicArn` - Tasks that access SQS and SNS need a valid topic Arn
 -   `tempDirectory` - OCIshellscript uses this variable to write a shell script to

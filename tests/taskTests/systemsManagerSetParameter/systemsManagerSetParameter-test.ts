@@ -62,7 +62,7 @@ const putParameterSucceeds = {
 jest.mock('OCI-sdk')
 
 describe('Systems Manager Set Parameter', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/SystemsManagerSetParameter/task.json')
     })

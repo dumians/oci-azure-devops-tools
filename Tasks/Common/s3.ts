@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { S3 } from 'OCI-sdk/clients/all'
+import { BlockStorage } from 'OCI-sdk/clients/all'
 
 // known mime types as recognized by the OCI SDK for .NET and
 // OCI Toolkit for Visual Studio
@@ -181,7 +181,7 @@ export const knownMimeTypes: Map<string, string> = new Map<string, string>([
     ['.wmv', 'video/x-ms-wmv']
 ])
 
-export async function testBucketExists(s3Client: S3, bucketName: string): Promise<boolean> {
+export async function testBucketExists(s3Client: BlockStorage, bucketName: string): Promise<boolean> {
     try {
         await s3Client.headBucket({ Bucket: bucketName }).promise()
 

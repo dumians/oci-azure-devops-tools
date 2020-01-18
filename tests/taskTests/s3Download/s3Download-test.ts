@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { S3 } from 'OCI-sdk'
+import { BlockStorage } from 'OCI-sdk'
 import { SdkUtils } from 'Common/sdkutils'
 import * as fs from 'fs'
 import { Readable as ReadableStream } from 'stream'
@@ -15,7 +15,7 @@ import { emptyConnectionParameters } from '../testCommon'
 // tslint:disable: no-unsafe-any
 jest.mock('OCI-sdk')
 
-describe('S3 Download', () => {
+describe('BlockStorage Download', () => {
     const baseTaskParameters: TaskParameters = {
         OCIConnectionParameters: emptyConnectionParameters,
         bucketName: '',
@@ -55,23 +55,23 @@ describe('S3 Download', () => {
     }
     const targetFolder: string = 'folder'
 
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/S3Download/task.json')
     })
 
     test('Creates a TaskOperation', () => {
         const taskParameters = baseTaskParameters
-        expect(new TaskOperations(new S3(), taskParameters)).not.toBeNull()
+        expect(new TaskOperations(new BlockStorage(), taskParameters)).not.toBeNull()
     })
 
     test('Handles not being able to connect to a bucket', async () => {
-        const s3 = new S3({ region: 'us-east-1' })
-        s3.headBucket = jest.fn()((params: any, cb: any) => {
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' })
+        BlockStorage.headBucket = jest.fn()((params: any, cb: any) => {
             throw new Error("doesn't exist dummy")
         })
         const taskParameters = baseTaskParameters
-        const taskOperation = new TaskOperations(s3, taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, taskParameters)
         expect.assertions(1)
         await taskOperation.execute().catch(e => {
             expect(e.message).toContain('not exist')
@@ -79,15 +79,15 @@ describe('S3 Download', () => {
     })
 
     test('Deals with null list objects succeeds', async () => {
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn((params, cb) => headBucketResponse)
-        s3.listObjects = jest.fn((params, cb) => listObjectsResponse)
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn((params, cb) => headBucketResponse)
+        BlockStorage.listObjects = jest.fn((params, cb) => listObjectsResponse)
         const taskParameters = baseTaskParameters
         taskParameters.targetFolder = targetFolder
         taskParameters.bucketName = 'what'
         // required parameter
         taskParameters.globExpressions = []
-        const taskOperation = new TaskOperations(s3, taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, taskParameters)
         await taskOperation.execute()
     })
 
@@ -98,15 +98,15 @@ describe('S3 Download', () => {
         try {
             fs.rmdirSync(targetFolder + '2')
         } catch (e) {}
-        const s3 = new S3({ region: 'us-east-1' }) as any
-        s3.headBucket = jest.fn((params, cb) => headBucketResponse)
-        s3.listObjects = jest.fn((params, cb) => listObjectsResponseWithContents)
-        s3.getObject = jest.fn((params, cb) => getObjectWithContents)
+        const BlockStorage = new BlockStorage({ region: 'us-east-1' }) as any
+        BlockStorage.headBucket = jest.fn((params, cb) => headBucketResponse)
+        BlockStorage.listObjects = jest.fn((params, cb) => listObjectsResponseWithContents)
+        BlockStorage.getObject = jest.fn((params, cb) => getObjectWithContents)
         const taskParameters = baseTaskParameters
         taskParameters.targetFolder = targetFolder + '2'
         taskParameters.bucketName = 'bucket'
         taskParameters.globExpressions = ['*']
-        const taskOperation = new TaskOperations(s3, taskParameters)
+        const taskOperation = new TaskOperations(BlockStorage, taskParameters)
         await taskOperation.execute()
     })
 

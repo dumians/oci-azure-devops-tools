@@ -10,7 +10,7 @@ information to effectively respond to your bug report or contribution.
 
 We welcome you to use the GitHub issue tracker to report bugs or suggest features.
 
-When filing an issue, please check [existing open](https://github.com/OCI/OCI-vsts-tools/issues), or [recently closed](https://github.com/OCI/OCI-vsts-tools/issues?q=is%3Aissue+is%3Aclosed), issues to make sure somebody else hasn't already
+When filing an issue, please check [existing open](https://github.com/dumians/OCI-vsts-tools/issues), or [recently closed](https://github.com/dumians/OCI-vsts-tools/issues?q=is%3Aissue+is%3Aclosed), issues to make sure somebody else hasn't already
 reported the issue. Please try to include as much information as you can. Details like these are incredibly useful:
 
 -   A reproducible test case or series of steps
@@ -94,13 +94,10 @@ If you have a test VSTS server, you can upload the packaged plugin from "\_packa
 
 ## Finding contributions to work on
 
-Looking at the existing issues is a great way to find something to contribute on. Looking at any ['help wanted'](https://github.com/OCI/OCI-vsts-tools/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) or ['technical debt'](https://github.com/OCI/OCI-vsts-tools/issues?q=is%3Aissue+is%3Aopen+label%3A%22technical-debt%22) issues is a great place to start.
+Looking at the existing issues is a great way to find something to contribute on. Looking at any ['help wanted'](https://github.com/dumians/OCI-vsts-tools/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) or ['technical debt'](https://github.com/dumians/OCI-vsts-tools/issues?q=is%3Aissue+is%3Aopen+label%3A%22technical-debt%22) issues is a great place to start.
 
 ## Code of Conduct
 
-This project has adopted the [Oracle Open Source Code of Conduct](https://OCI.github.io/code-of-conduct).
-For more information see the [Code of Conduct FAQ](https://OCI.github.io/code-of-conduct-faq) or contact
-[opensource-codeofconduct@Oracle.com](mailto:opensource-codeofconduct@Oracle.com) with any additional questions or comments.
 
 ## Licensing
 

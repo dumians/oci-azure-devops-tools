@@ -47,7 +47,7 @@ const secretsManagerReturnsCreate = {
 }
 
 describe('Secrets Manger Create Or Update Secret', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/SecretsManagerCreateOrUpdateSecret/task.json')
     })

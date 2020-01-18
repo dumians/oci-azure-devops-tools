@@ -4,7 +4,7 @@
     "friendlyName": "OCI CloudFormation Create/Update Stack",
     "description": "Creates a new OCI CloudFormation stack or updates the stack if it exists.",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [OCI CloudFormation User Guide](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/) for more details on working with OCI CloudFormation.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/cloudformation-create-update.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* cloudformation:CreateChangeSet\n* cloudformation:CreateStack\n* cloudformation:DeleteChangeSet\n* cloudformation:DescribeChangeSet\n* cloudformation:DescribeStacks\n* cloudformation:DescribeStackResources\n* cloudformation:ExecuteChangeSet\n* cloudformation:UpdateStack\n\nThe task may also require permissions to upload your application template to the specified Oracle S3 bucket.",
+    "helpMarkDown": "Please refer to [OCI CloudFormation User Guide](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/) for more details on working with OCI CloudFormation.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/cloudformation-create-update.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* cloudformation:CreateChangeSet\n* cloudformation:CreateStack\n* cloudformation:DeleteChangeSet\n* cloudformation:DescribeChangeSet\n* cloudformation:DescribeStacks\n* cloudformation:DescribeStackResources\n* cloudformation:ExecuteChangeSet\n* cloudformation:UpdateStack\n\nThe task may also require permissions to upload your application template to the specified Oracle BlockStorage bucket.",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
@@ -67,12 +67,12 @@
             "type": "pickList",
             "label": "Template Source",
             "required": true,
-            "helpMarkDown": "Specifies the location of the template to use to create or update the stack. You can specify the template using either the path to a file in the local file system, a URL to the file or an object in Oracle S3, for which you can specify the bucket and object name (key).\n\nNote that CloudFormation limits the size of template files uploaded to the service to 51,200 bytes. If your template is larger than the allowed size you should choose either the URL or Oracle S3 location options. You can also specify a bucket name for the local file option. If a bucket name  is specified the template is uploaded to the bucket by the task (the object key will be the template filename, less any path).\n\nWhen the task uploads the template to a bucket, or you specify an Oracle S3 bucket name and object key,the task generates a URL to the object and supplies the URL to CloudFormation.\n\n If *Use previous template* is selected CloudFormation will reuse the existing template that is associated with the stack that you are updating. Selecting this option when the stack does not exist will cause the task to report an error and quit.",
+            "helpMarkDown": "Specifies the location of the template to use to create or update the stack. You can specify the template using either the path to a file in the local file system, a URL to the file or an object in Oracle BlockStorage, for which you can specify the bucket and object name (key).\n\nNote that CloudFormation limits the size of template files uploaded to the service to 51,200 bytes. If your template is larger than the allowed size you should choose either the URL or Oracle BlockStorage location options. You can also specify a bucket name for the local file option. If a bucket name  is specified the template is uploaded to the bucket by the task (the object key will be the template filename, less any path).\n\nWhen the task uploads the template to a bucket, or you specify an Oracle BlockStorage bucket name and object key,the task generates a URL to the object and supplies the URL to CloudFormation.\n\n If *Use previous template* is selected CloudFormation will reuse the existing template that is associated with the stack that you are updating. Selecting this option when the stack does not exist will cause the task to report an error and quit.",
             "defaultValue": "file",
             "options": {
                 "file": "Local file",
                 "url": "URL to the template file",
-                "s3": "Oracle S3 bucket and object key",
+                "BlockStorage": "Oracle BlockStorage bucket and object key",
                 "usePrevious": "Use previous template"
             }
         },
@@ -81,31 +81,31 @@
             "type": "filePath",
             "label": "Template File",
             "required": false,
-            "helpMarkDown": "Path to the template file for the stack. This field is required if Template Source is set to use a local file. Template files smaller than 51,200 bytes can be uploaded directly to CloudFormation by the task. For templates larger than 51,200 bytes you should also supply the name of an Oracle S3 bucket to which the template file can be uploaded. If a bucket name is specified the task will upload the template file and then generate a URL to the template file in the bucket which will be used when specifying the template location to CloudFormation.\n\nFor more information see [Template Anatomy](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/template-anatomy.html) in the OCI CloudFormation User Guide.",
+            "helpMarkDown": "Path to the template file for the stack. This field is required if Template Source is set to use a local file. Template files smaller than 51,200 bytes can be uploaded directly to CloudFormation by the task. For templates larger than 51,200 bytes you should also supply the name of an Oracle BlockStorage bucket to which the template file can be uploaded. If a bucket name is specified the task will upload the template file and then generate a URL to the template file in the bucket which will be used when specifying the template location to CloudFormation.\n\nFor more information see [Template Anatomy](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/template-anatomy.html) in the OCI CloudFormation User Guide.",
             "visibleRule": "templateSource = file"
         },
         {
             "name": "s3BucketName",
             "type": "string",
-            "label": "S3 Bucket",
+            "label": "BlockStorage Bucket",
             "required": false,
-            "helpMarkDown": "The name of the bucket to which a local template file can be uploaded, or which contains the template to be used. If Template Source is set to *Oracle S3 bucket and object key* this parameter is required.\n\nFor more information see [Template Anatomy](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/template-anatomy.html) in the OCI CloudFormation User Guide.",
-            "visibleRule": "templateSource = file || templateSource = s3"
+            "helpMarkDown": "The name of the bucket to which a local template file can be uploaded, or which contains the template to be used. If Template Source is set to *Oracle BlockStorage bucket and object key* this parameter is required.\n\nFor more information see [Template Anatomy](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/template-anatomy.html) in the OCI CloudFormation User Guide.",
+            "visibleRule": "templateSource = file || templateSource = BlockStorage"
         },
         {
             "name": "s3ObjectKey",
             "type": "string",
-            "label": "S3 Object Key",
+            "label": "BlockStorage Object Key",
             "required": false,
-            "helpMarkDown": "The name of the template file in the S3 bucket. The task will generate a URL to the file when specifying the location of the template file to CloudFormation. If Template Source is set to *Oracle S3 bucket and object key* this parameter is required.\n\nFor more information see [Template Anatomy](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/template-anatomy.html) in the OCI CloudFormation User Guide.",
-            "visibleRule": "templateSource = s3"
+            "helpMarkDown": "The name of the template file in the BlockStorage bucket. The task will generate a URL to the file when specifying the location of the template file to CloudFormation. If Template Source is set to *Oracle BlockStorage bucket and object key* this parameter is required.\n\nFor more information see [Template Anatomy](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/template-anatomy.html) in the OCI CloudFormation User Guide.",
+            "visibleRule": "templateSource = BlockStorage"
         },
         {
             "name": "templateUrl",
             "type": "string",
             "label": "Template URL",
             "required": false,
-            "helpMarkDown": "URL reference to the template file in Oracle S3. This field is required if Template Source is set to use a URL. When stored in Oracle S3 template files are subject to a maximum size of 460,800 bytes.\n\nFor more information see [Template Anatomy](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/template-anatomy.html) in the OCI CloudFormation User Guide.",
+            "helpMarkDown": "URL reference to the template file in Oracle BlockStorage. This field is required if Template Source is set to use a URL. When stored in Oracle BlockStorage template files are subject to a maximum size of 460,800 bytes.\n\nFor more information see [Template Anatomy](https://docs.OCI.Oracle.com/OCICloudFormation/latest/UserGuide/template-anatomy.html) in the OCI CloudFormation User Guide.",
             "visibleRule": "templateSource = url"
         },
         {

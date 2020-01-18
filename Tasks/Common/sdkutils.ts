@@ -5,7 +5,7 @@
 
 import * as tl from 'azure-pipelines-task-lib/task'
 
-import { IAM, S3 } from 'OCI-sdk/clients/all'
+import { IAM, BlockStorage } from 'OCI-sdk/clients/all'
 import * as OCI from 'OCI-sdk/global'
 import { OCIConnectionParameters, getCredentials, getRegion } from 'Common/OCIConnectionParameters'
 import { VSTSTaskManifest } from 'Common/vstsUtils'
@@ -186,7 +186,7 @@ export abstract class SdkUtils {
     }
 
     public static async getPresignedUrl(
-        s3Client: S3,
+        s3Client: BlockStorage,
         operation: string,
         bucketName: string,
         objectKey: string

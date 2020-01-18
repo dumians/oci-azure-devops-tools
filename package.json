@@ -20,21 +20,20 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/OCI/OCI-vsts-tools"
+        "url": "https://github.com/dumians/OCI-vsts-tools"
     },
     "keywords": [
         "OCI",
-        "s3",
-        "cloudformation",
+        "BlockStorage",
+        "OKE",
         "cli",
-        "lambda",
-        "codedeploy",
+        "Function",
         "ec2"
     ],
     "author": "oracle",
     "license": "apache",
-    "bugs": "https://github.com/OCI/OCI-vsts-tools/issues",
-    "homepage": "https://github.com/OCI/OCI-vsts-tools",
+    "bugs": "https://github.com/dumians/OCI-vsts-tools/issues",
+    "homepage": "https://github.com/dumians/OCI-vsts-tools",
     "devDependencies": {
         "@types/archiver": "^3.0.0",
         "@types/base-64": "^0.1.3",

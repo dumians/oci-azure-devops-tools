@@ -5,7 +5,7 @@
 
 import archiver = require('archiver')
 import CodeDeploy = require('OCI-sdk/clients/codedeploy')
-import S3 = require('OCI-sdk/clients/s3')
+import BlockStorage = require('OCI-sdk/clients/BlockStorage')
 import { OCIError } from 'OCI-sdk/lib/error'
 import * as tl from 'azure-pipelines-task-lib/task'
 import { SdkUtils } from 'Common/sdkutils'
@@ -22,7 +22,7 @@ import {
 export class TaskOperations {
     public constructor(
         public readonly codeDeployClient: CodeDeploy,
-        public readonly s3Client: S3,
+        public readonly s3Client: BlockStorage,
         public readonly taskParameters: TaskParameters
     ) {}
 
@@ -123,7 +123,7 @@ export class TaskOperations {
         console.log(tl.loc('UploadingBundle', archiveName, key, this.taskParameters.bucketName))
         const fileBuffer = fs.createReadStream(archiveName)
         try {
-            const response: S3.ManagedUpload.SendData = await this.s3Client
+            const response: BlockStorage.ManagedUpload.SendData = await this.s3Client
                 .upload({
                     Bucket: this.taskParameters.bucketName,
                     Key: key,
@@ -202,7 +202,7 @@ export class TaskOperations {
                 ignoreApplicationStopFailures: this.taskParameters.ignoreApplicationStopFailures,
                 updateOutdatedInstancesOnly: this.taskParameters.updateOutdatedInstancesOnly,
                 revision: {
-                    revisionType: 'S3',
+                    revisionType: 'BlockStorage',
                     s3Location: {
                         bucket: this.taskParameters.bucketName,
                         key: bundleKey,

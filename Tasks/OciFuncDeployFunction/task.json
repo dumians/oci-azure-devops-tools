@@ -1,15 +1,15 @@
 {
     "id": "ec87c253-756f-4a7a-be91-4f1c60f9d8fe",
     "name": "LambdaDeployFunction",
-    "friendlyName": "OCI Lambda Deploy Function",
-    "description": "General purpose deployment of OCI Lambda functions for all supported language runtimes.",
+    "friendlyName": "OCI Function Deploy Function",
+    "description": "General purpose deployment of OCI Function functions for all supported language runtimes.",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [OCI Lambda Developer Guide](https://docs.OCI.Oracle.com/lambda/latest/dg/) for more information on working with OCI Lambda.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/lambda-deploy.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* lambda:CreateFunction\n* lambda:GetFunction\n* lambda:UpdateFunctionCode\n* lambda:UpdateFunctionConfiguration",
+    "helpMarkDown": "Please refer to [OCI Function Developer Guide](https://docs.OCI.Oracle.com/Function/latest/dg/) for more information on working with OCI Function.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/Function-deploy.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* Function:CreateFunction\n* Function:GetFunction\n* Function:UpdateFunctionCode\n* Function:UpdateFunctionConfiguration",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
     "minimumAgentVersion": "1.91.0",
-    "instanceNameFormat": "Deploy Lambda Function: $(functionName)",
+    "instanceNameFormat": "Deploy Function Function: $(functionName)",
     "groups": [
         {
             "name": "advanced",
@@ -67,7 +67,7 @@
             "label": "Function Name",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The name of the Lambda function to create or update. You can also specify the Oracle Resource Name (ARN) for an existing function."
+            "helpMarkDown": "The name of the Function function to create or update. You can also specify the Oracle Resource Name (ARN) for an existing function."
         },
         {
             "name": "description",
@@ -75,7 +75,7 @@
             "label": "Description",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "A short, user-defined function description. Lambda does not use this value.",
+            "helpMarkDown": "A short, user-defined function description. Function does not use this value.",
             "visibleRule": "deploymentMode = codeandconfiguration"
         },
         {
@@ -84,7 +84,7 @@
             "label": "Function Handler",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The function within your code that Lambda calls to begin execution. For Node.js, it is the module-name.export value in your function. For Java, it can be package.class-name::handler or package.class-name. For more information and other examples see [Programming Model](https://docs.OCI.Oracle.com/lambda/latest/dg/programming-model-v2.html).",
+            "helpMarkDown": "The function within your code that Function calls to begin execution. For Node.js, it is the module-name.export value in your function. For Java, it can be package.class-name::handler or package.class-name. For more information and other examples see [Programming Model](https://docs.OCI.Oracle.com/Function/latest/dg/programming-model-v2.html).",
             "visibleRule": "deploymentMode = codeandconfiguration"
         },
         {
@@ -93,7 +93,7 @@
             "label": "Runtime",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The runtime environment for the Lambda function you are uploading. The list of runtimes available in the pick list are those known at the time this version of the tools was released. To use a runtime not shown in the list simply enter the runtime identifier in the field.",
+            "helpMarkDown": "The runtime environment for the Function function you are uploading. The list of runtimes available in the pick list are those known at the time this version of the tools was released. To use a runtime not shown in the list simply enter the runtime identifier in the field.",
             "options": {
                 "provided": "provided",
                 "dotnetcore2.1": "dotnetcore2.1",
@@ -117,10 +117,10 @@
             "label": "Code Location",
             "defaultValue": "localfile",
             "required": true,
-            "helpMarkDown": "The source of the code for the function. You can select a zip file in the work area or a zip file previously uploaded to Oracle S3. If the source location is Oracle S3 you can also optionally supply a specific version of the file.",
+            "helpMarkDown": "The source of the code for the function. You can select a zip file in the work area or a zip file previously uploaded to Oracle BlockStorage. If the source location is Oracle BlockStorage you can also optionally supply a specific version of the file.",
             "options": {
                 "localfile": "Zip file in the work area",
-                "s3object": "Zip file in Oracle S3"
+                "s3object": "Zip file in Oracle BlockStorage"
             }
         },
         {
@@ -135,16 +135,16 @@
         {
             "name": "s3Bucket",
             "type": "string",
-            "label": "S3 Bucket Name",
+            "label": "BlockStorage Bucket Name",
             "required": false,
             "defaultValue": "",
-            "helpMarkDown": "The name of the Oracle S3 bucket containing the previously uploaded zip file of the function's code. Required if _Code Location_ is set to _Zip file in Oracle S3_.",
+            "helpMarkDown": "The name of the Oracle BlockStorage bucket containing the previously uploaded zip file of the function's code. Required if _Code Location_ is set to _Zip file in Oracle S3_.",
             "visibleRule": "codeLocation = s3object"
         },
         {
             "name": "s3ObjectKey",
             "type": "string",
-            "label": "S3 Object Key",
+            "label": "BlockStorage Object Key",
             "required": false,
             "defaultValue": "",
             "helpMarkDown": "The key (name) of the object in the bucket containing the function's code.  Required if _Code Location_ is set to _Zip file in Oracle S3_.",
@@ -153,10 +153,10 @@
         {
             "name": "s3ObjectVersion",
             "type": "string",
-            "label": "S3 Object Version",
+            "label": "BlockStorage Object Version",
             "required": false,
             "defaultValue": "",
-            "helpMarkDown": "Version of the S3 object containing the function code. If not specified the latest version of the object is used.",
+            "helpMarkDown": "Version of the BlockStorage object containing the function code. If not specified the latest version of the object is used.",
             "visibleRule": "codeLocation = s3object"
         },
         {
@@ -165,7 +165,7 @@
             "label": "Role ARN or Name",
             "required": true,
             "defaultValue": "",
-            "helpMarkDown": "The Oracle Resource Name (ARN), or name, of the IAM role that Lambda assumes when it executes your function to access any other Oracle Web Services (OCI) resources. If a role name is supplied the task will attempt to retrieve the ARN automatically.",
+            "helpMarkDown": "The Oracle Resource Name (ARN), or name, of the IAM role that Function assumes when it executes your function to access any other Oracle Web Services (OCI) resources. If a role name is supplied the task will attempt to retrieve the ARN automatically.",
             "visibleRule": "deploymentMode = codeandconfiguration"
         },
         {
@@ -174,7 +174,7 @@
             "label": "Memory Size",
             "required": false,
             "defaultValue": "128",
-            "helpMarkDown": "The amount of memory, in MB, your Lambda function is given. Lambda uses this memory size to infer the amount of CPU and memory allocated to your function. Your function use-case determines your CPU and memory requirements. For example, a database operation might need less memory compared to an image processing function. The default value is 128 MB. The value must be a multiple of 64 MB.",
+            "helpMarkDown": "The amount of memory, in MB, your Function function is given. Function uses this memory size to infer the amount of CPU and memory allocated to your function. Your function use-case determines your CPU and memory requirements. For example, a database operation might need less memory compared to an image processing function. The default value is 128 MB. The value must be a multiple of 64 MB.",
             "visibleRule": "deploymentMode = codeandconfiguration"
         },
         {
@@ -183,7 +183,7 @@
             "label": "Timeout",
             "required": false,
             "defaultValue": "3",
-            "helpMarkDown": "The function execution time at which Lambda should terminate the function. Because the execution time has cost implications, we recommend you set this value based on your expected execution time. The default is 3 seconds.",
+            "helpMarkDown": "The function execution time at which Function should terminate the function. Because the execution time has cost implications, we recommend you set this value based on your expected execution time. The default is 3 seconds.",
             "visibleRule": "deploymentMode = codeandconfiguration"
         },
         {
@@ -192,15 +192,15 @@
             "label": "Publish",
             "required": false,
             "defaultValue": "true",
-            "helpMarkDown": "If set requests OCI Lambda to create or update the Lambda function and publish a version as an atomic operation."
+            "helpMarkDown": "If set requests OCI Function to create or update the Function function and publish a version as an atomic operation."
         },
         {
             "name": "layers",
             "type": "multiLine",
-            "label": "Lambda Layers",
+            "label": "Function Layers",
             "required": false,
             "defaultValue": "",
-            "helpMarkDown": "List of Lambda Layer ARNs (including version), one per line.",
+            "helpMarkDown": "List of Function Layer ARNs (including version), one per line.",
             "visibleRule": "deploymentMode = codeandconfiguration"
         },
         {
@@ -218,7 +218,7 @@
             "label": "KMS Key ARN",
             "required": false,
             "defaultValue": "",
-            "helpMarkDown": "The Oracle Resource Name (ARN) of the KMS key used to encrypt your function's environment variables. If not provided, OCI Lambda will use a default service key.",
+            "helpMarkDown": "The Oracle Resource Name (ARN) of the KMS key used to encrypt your function's environment variables. If not provided, OCI Function will use a default service key.",
             "groupName": "advanced"
         },
         {
@@ -245,7 +245,7 @@
             "label": "Security Group IDs",
             "required": false,
             "defaultValue": "",
-            "helpMarkDown": "List of security group IDs, one per line. If your Lambda function accesses resources in a VPC at least one security group and one subnet ID must be specified, which must belong to the same VPC.",
+            "helpMarkDown": "List of security group IDs, one per line. If your Function function accesses resources in a VPC at least one security group and one subnet ID must be specified, which must belong to the same VPC.",
             "groupName": "advanced"
         },
         {
@@ -254,7 +254,7 @@
             "label": "Subnet IDs",
             "required": false,
             "defaultValue": "",
-            "helpMarkDown": "List of subnet IDs, one per line. If your Lambda function accesses resources in a VPC at least one security group and one subnet ID must be specified, which must belong to the same VPC.",
+            "helpMarkDown": "List of subnet IDs, one per line. If your Function function accesses resources in a VPC at least one security group and one subnet ID must be specified, which must belong to the same VPC.",
             "groupName": "advanced"
         },
         {
@@ -310,7 +310,7 @@
         "UpdatingFunctionCode": "Updating code for function %s",
         "UpdatingFunctionConfiguration": "Updating configuration for function %s",
         "FunctionNotFound": "Function %s does not exist, cannot update code only",
-        "TaskCompleted": "Completed create or update of Lambda function %s, function ARN %s",
+        "TaskCompleted": "Completed create or update of Function function %s, function ARN %s",
         "AddingTag": "Adding tag. Key '%s', Value '%s'",
         "NoFunctionArnReturned": "No function ARN returned from the service! Deployment failed!"
     }

@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { S3 } from 'OCI-sdk/clients/all'
+import { BlockStorage } from 'OCI-sdk/clients/all'
 import * as tl from 'azure-pipelines-task-lib/task'
 import * as fs from 'fs'
 import * as mm from 'minimatch'
 import * as path from 'path'
 
-import { testBucketExists } from 'Common/s3'
+import { testBucketExists } from 'Common/BlockStorage'
 import { aes256AlgorithmValue, customerManagedKeyValue, TaskParameters } from './TaskParameters'
 
 export class TaskOperations {
-    public constructor(public readonly s3Client: S3, public readonly taskParameters: TaskParameters) {}
+    public constructor(public readonly s3Client: BlockStorage, public readonly taskParameters: TaskParameters) {}
 
     public async execute(): Promise<void> {
         const exists = await testBucketExists(this.s3Client, this.taskParameters.bucketName)
@@ -63,7 +63,7 @@ export class TaskOperations {
                 }
 
                 console.log(tl.loc('QueueingDownload', matchedKey))
-                const params: S3.GetObjectRequest = {
+                const params: BlockStorage.GetObjectRequest = {
                     Bucket: this.taskParameters.bucketName,
                     Key: matchedKey
                 }
@@ -80,7 +80,7 @@ export class TaskOperations {
         return Promise.all(allDownloads)
     }
 
-    private async downloadFile(s3Params: S3.GetObjectRequest, dest: string): Promise<void> {
+    private async downloadFile(s3Params: BlockStorage.GetObjectRequest, dest: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const dir: string = path.dirname(dest)
             if (!fs.existsSync(dir)) {
@@ -109,7 +109,7 @@ export class TaskOperations {
         // tslint:disable-next-line:no-unnecessary-initializer
         let nextToken: string | undefined = undefined
         do {
-            const params: S3.ListObjectsRequest = {
+            const params: BlockStorage.ListObjectsRequest = {
                 Bucket: this.taskParameters.bucketName,
                 Prefix: this.taskParameters.sourceFolder,
                 Marker: nextToken

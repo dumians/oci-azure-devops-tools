@@ -1,7 +1,7 @@
 {
     "name": "lambdadeployfunction",
     "version": "1.1.8",
-    "description": "Builds and deploys an OCI Lambda function for the supported Lambda runtimes.",
+    "description": "Builds and deploys an OCI Function function for the supported Function runtimes.",
     "main": "LambdaDeployFunction.js",
     "author": "",
     "license": "MIT",

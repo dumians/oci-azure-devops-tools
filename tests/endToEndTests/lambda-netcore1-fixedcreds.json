@@ -13,7 +13,7 @@
     ],
     "variables": {
         "system.debug": { "value": "false", "allowOverride": true },
-        "functionName": { "value": "TFS2017-lambda-netcore1-toupper-fixedcreds", "allowOverride": true }
+        "functionName": { "value": "TFS2017-Function-netcore1-toupper-fixedcreds", "allowOverride": true }
     },
     "jobAuthorizationScope": 1,
     "jobTimeoutInMinutes": 60,
@@ -192,7 +192,7 @@
     "quality": 1,
     "drafts": [],
     "id": 14,
-    "name": "lambda-netcore1-fixedcreds",
+    "name": "Function-netcore1-fixedcreds",
     "path": "\\",
     "type": 2,
     "queueStatus": 0,

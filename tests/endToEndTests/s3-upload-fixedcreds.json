@@ -13,7 +13,7 @@
     ],
     "variables": {
         "system.debug": { "value": "false", "allowOverride": true },
-        "targetFolder": { "value": "s3/uploadcontent-fixedcreds", "allowOverride": true }
+        "targetFolder": { "value": "BlockStorage/uploadcontent-fixedcreds", "allowOverride": true }
     },
     "jobAuthorizationScope": 1,
     "jobTimeoutInMinutes": 60,
@@ -143,7 +143,7 @@
     "quality": 1,
     "drafts": [],
     "id": 23,
-    "name": "s3-upload-fixedcreds",
+    "name": "BlockStorage-upload-fixedcreds",
     "path": "\\",
     "type": 2,
     "queueStatus": 0,

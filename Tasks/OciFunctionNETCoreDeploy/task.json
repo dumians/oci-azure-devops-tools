@@ -1,19 +1,19 @@
 {
     "id": "0c632a66-60d4-498a-88c8-1c69cc057ef1",
     "name": "LambdaNETCoreDeploy",
-    "friendlyName": "OCI Lambda .NET Core",
-    "description": "Builds, packages and deploys a .NET Core OCI Lambda function or serverless application. Optionally, the task can create a deployment package for subsequent deployment in another build or release pipeline",
+    "friendlyName": "OCI Function .NET Core",
+    "description": "Builds, packages and deploys a .NET Core OCI Function function or serverless application. Optionally, the task can create a deployment package for subsequent deployment in another build or release pipeline",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [OCI Lambda Developer Guide](https://docs.OCI.Oracle.com/lambda/latest/dg/) for more information on working with OCI Lambda.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/lambda-netcore-deploy.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* lambda:CreateFunction\n* lambda:UpdateFunctionCode\n* lambda:GetFunctionConfiguration\n* cloudformation:CreateChangeSet\n* cloudformation:ExecuteChangeSet\n* cloudformation:DescribeStackEvents\n* cloudformation:DeleteStack\n* cloudformation:DescribeChangeSet\n* cloudformation:DescribeStacks\n* s3:CreateBucket\n* s3:GetBucketLocation\n\nThe task also requires permissions to upload your Lambda function or serverless application content to the specified Oracle S3 bucket. Depending on the size of the application bundle, either putObject or the S3 multi-part upload APIs may be used.",
+    "helpMarkDown": "Please refer to [OCI Function Developer Guide](https://docs.OCI.Oracle.com/Function/latest/dg/) for more information on working with OCI Function.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/Function-netcore-deploy.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* Function:CreateFunction\n* Function:UpdateFunctionCode\n* Function:GetFunctionConfiguration\n* cloudformation:CreateChangeSet\n* cloudformation:ExecuteChangeSet\n* cloudformation:DescribeStackEvents\n* cloudformation:DeleteStack\n* cloudformation:DescribeChangeSet\n* cloudformation:DescribeStacks\n* BlockStorage:CreateBucket\n* BlockStorage:GetBucketLocation\n\nThe task also requires permissions to upload your Function function or serverless application content to the specified Oracle BlockStorage bucket. Depending on the size of the application bundle, either putObject or the BlockStorage multi-part upload APIs may be used.",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
     "minimumAgentVersion": "1.91.0",
-    "instanceNameFormat": "Deploy .NET Core to Lambda: $(functionName) $(stackName)",
+    "instanceNameFormat": "Deploy .NET Core to Function: $(functionName) $(stackName)",
     "groups": [
         {
             "name": "deployFunction",
-            "displayName": "Lambda Function Properties",
+            "displayName": "Function Function Properties",
             "isExpanded": true,
             "visibleRule": "command = deployFunction"
         },
@@ -56,7 +56,7 @@
             "label": "Deployment Type",
             "defaultValue": "deployFunction",
             "required": true,
-            "helpMarkDown": "The type of deployment to perform, or package to build or deploy.\n\n* _Function_ deploys a single function to OCI Lambda, or creates a package zip file for subsequent deployment.\n* _Serverless Application_ performs a deployment using OCI CloudFormation (allowing multiple functions to be deployed at the same time) or builds the application and uploads it to Oracle S3, outputting the serverless template file for subsequent deployment of the updated code using OCI CloudFormation.\n\n__Note:__ both options will perform the relevant NuGet package restore and build operations to create the resulting deployment package.",
+            "helpMarkDown": "The type of deployment to perform, or package to build or deploy.\n\n* _Function_ deploys a single function to OCI Function, or creates a package zip file for subsequent deployment.\n* _Serverless Application_ performs a deployment using OCI CloudFormation (allowing multiple functions to be deployed at the same time) or builds the application and uploads it to Oracle BlockStorage, outputting the serverless template file for subsequent deployment of the updated code using OCI CloudFormation.\n\n__Note:__ both options will perform the relevant NuGet package restore and build operations to create the resulting deployment package.",
             "options": {
                 "deployFunction": "Function",
                 "deployServerless": "Serverless Application"
@@ -71,7 +71,7 @@
             "label": "Create deployment package only",
             "required": true,
             "defaultValue": "false",
-            "helpMarkDown": "If selected the task creates the outputs for the selected deployment type but does not perform the deployment to OCI lambda or OCI CloudFormation."
+            "helpMarkDown": "If selected the task creates the outputs for the selected deployment type but does not perform the deployment to OCI Function or OCI CloudFormation."
         },
         {
             "name": "packageOutputFile",
@@ -79,16 +79,16 @@
             "label": "Package-only output file",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "* For a package-only build of a Lambda function project: the output folder and filename of the packaged zip file. This zip file can then be used with the _OCI Lambda Deploy Function_ task to perform the deployment at a later stage.\n\n* For a package-only build of a Serverless Application project: the output folder and filename where the serverless template file, updated to contain the Oracle S3 location of the built project code and artifacts, will be placed. This updated template can then be used with the _OCI CloudFormation Create/Update Stack_ task, or OCI CloudFormation change set tasks, to perform the deployment at a later stage.",
+            "helpMarkDown": "* For a package-only build of a Function function project: the output folder and filename of the packaged zip file. This zip file can then be used with the _OCI Function Deploy Function_ task to perform the deployment at a later stage.\n\n* For a package-only build of a Serverless Application project: the output folder and filename where the serverless template file, updated to contain the Oracle BlockStorage location of the built project code and artifacts, will be placed. This updated template can then be used with the _OCI CloudFormation Create/Update Stack_ task, or OCI CloudFormation change set tasks, to perform the deployment at a later stage.",
             "visibleRule": "packageOnly = true"
         },
         {
             "name": "lambdaProjectPath",
-            "label": "Path to Lambda Project",
+            "label": "Path to Function Project",
             "type": "filePath",
             "required": false,
             "defaultValue": "",
-            "helpMarkDown": "The relative path to the location of the Lambda function or serverless application project to package and/or deploy."
+            "helpMarkDown": "The relative path to the location of the Function function or serverless application project to package and/or deploy."
         },
         {
             "name": "functionName",
@@ -97,7 +97,7 @@
             "defaultValue": "",
             "required": false,
             "groupName": "deployFunction",
-            "helpMarkDown": "The name for the deployed Lambda function. You can also specify the Oracle Resource name (ARN) of the function when deploying to an existing function."
+            "helpMarkDown": "The name for the deployed Function function. You can also specify the Oracle Resource name (ARN) of the function when deploying to an existing function."
         },
         {
             "name": "functionRole",
@@ -106,7 +106,7 @@
             "defaultValue": "",
             "required": false,
             "groupName": "deployFunction",
-            "helpMarkDown": "The name of the OCI Identity and Access Management (IAM) Role that provides access to OCI services to the deployed Lambda function."
+            "helpMarkDown": "The name of the OCI Identity and Access Management (IAM) Role that provides access to OCI services to the deployed Function function."
         },
         {
             "name": "functionHandler",
@@ -115,7 +115,7 @@
             "defaultValue": "",
             "required": false,
             "groupName": "deployFunction",
-            "helpMarkDown": "The function within your code that Lambda calls to begin execution. Format is &lt;assembly-name&gt;::&lt;namespace.type-name&gt;::&lt;function-name&gt;."
+            "helpMarkDown": "The function within your code that Function calls to begin execution. Format is &lt;assembly-name&gt;::&lt;namespace.type-name&gt;::&lt;function-name&gt;."
         },
         {
             "name": "functionMemory",
@@ -124,7 +124,7 @@
             "defaultValue": "",
             "required": false,
             "groupName": "deployFunction",
-            "helpMarkDown": "Memory allocated to the Lambda function. The value must be in multiples of 64."
+            "helpMarkDown": "Memory allocated to the Function function. The value must be in multiples of 64."
         },
         {
             "name": "functionTimeout",
@@ -133,7 +133,7 @@
             "defaultValue": "",
             "required": false,
             "groupName": "deployFunction",
-            "helpMarkDown": "The function execution time at which Lambda should terminate the function."
+            "helpMarkDown": "The function execution time at which Function should terminate the function."
         },
         {
             "name": "stackName",
@@ -147,24 +147,24 @@
         {
             "name": "s3Bucket",
             "type": "string",
-            "label": "S3 Bucket",
+            "label": "BlockStorage Bucket",
             "defaultValue": "",
             "required": false,
             "groupName": "deployServerless",
-            "helpMarkDown": "The name of the Oracle S3 bucket used to store the built project code. This field is required when performing a either a deployment or package-only build of a serverless application."
+            "helpMarkDown": "The name of the Oracle BlockStorage bucket used to store the built project code. This field is required when performing a either a deployment or package-only build of a serverless application."
         },
         {
             "name": "s3Prefix",
             "type": "string",
-            "label": "S3 Prefix",
+            "label": "BlockStorage Prefix",
             "defaultValue": "",
             "required": false,
             "groupName": "deployServerless",
-            "helpMarkDown": "The object key prefix to be used for the packaged objects that will be uploaded to Oracle S3 for subsequent deployment."
+            "helpMarkDown": "The object key prefix to be used for the packaged objects that will be uploaded to Oracle BlockStorage for subsequent deployment."
         },
         {
             "name": "additionalArgs",
-            "label": "Additional Lambda Tools Command Line Arguments",
+            "label": "Additional Function Tools Command Line Arguments",
             "type": "string",
             "required": false,
             "defaultValue": "",
@@ -179,11 +179,11 @@
         }
     },
     "messages": {
-        "DeployingProjectAt": "Processing Lambda project at %s",
-        "ReadingDefaultSettingsFile": "Reading existing OCI-lambda-tools-defaults.json",
+        "DeployingProjectAt": "Processing Function project at %s",
+        "ReadingDefaultSettingsFile": "Reading existing OCI-Function-tools-defaults.json",
         "ClearingProfileCredentials": "Clearing out profile %s so task credentials will be used.",
         "StartingDotNetRestore": "Beginning dotnet restore",
-        "StartingFunctionDeployment": "Beginning Lambda Deployment",
+        "StartingFunctionDeployment": "Beginning Function Deployment",
         "StartingServerlessDeployment": "Beginning Serverless Deployment",
         "UnknownDeploymentTypeError": "Unknown deployment type: %s",
         "DotNetCommandFailure": "'dotnet %s' exited with code %d",
@@ -192,9 +192,9 @@
         "CreatingFunctionPackageOnly": "Performing package-only build of function, output package will be placed in %s",
         "PackageAndDeployTaskCompleted": "Completed packaging and deployment of the project",
         "PackageOnlyTaskCompleted": "Completed packaging of the project",
-        "InstallingOrUpdatingLambdaTools": "Lambda tools not found, installing or updating them!",
-        "LambdaToolsInstallFailed": "Install of dotnet lambda tools failed with: %s",
-        "LambdaToolsUpdateFailed": "Update of dotnet lambda tools failed with: %s",
-        "LambdaToolsPathNotFound": "Lambda tools not found after install! install failed!"
+        "InstallingOrUpdatingLambdaTools": "Function tools not found, installing or updating them!",
+        "LambdaToolsInstallFailed": "Install of dotnet Function tools failed with: %s",
+        "LambdaToolsUpdateFailed": "Update of dotnet Function tools failed with: %s",
+        "LambdaToolsPathNotFound": "Function tools not found after install! install failed!"
     }
 }

@@ -47,7 +47,7 @@ export class TaskOperations {
 
             case fromTags:
                 request.Targets = []
-                // TODO repalce with getTags when https://github.com/OCI/OCI-vsts-tools/pull/184 merges
+                // TODO repalce with getTags when https://github.com/dumians/OCI-vsts-tools/pull/184 merges
                 this.taskParameters.instanceTags.forEach(it => {
                     const kv = it.split('=')
                     const t: SSM.Target = {}

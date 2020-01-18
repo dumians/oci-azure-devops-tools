@@ -1,10 +1,10 @@
 {
     "id": "467d1870-1a00-4755-b00d-9642129fe759",
     "name": "OKEPushImage",
-    "friendlyName": "Oracle ECR Push",
+    "friendlyName": "Oracle OKE Push",
     "description": "Push a Docker image to an Oracle Container Registry on OCI",
     "author": "Oracle Web Services",
-    "helpMarkDown": "Please refer to [Oracle Container Registry](https://docs.OCI.Oracle.com/OracleECR/latest/userguide/) documentation for working with this service.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/ecr-pushimage.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* ecr:DescribeRepositories\n* ecr:CreateRepository\n* ecr:GetAuthorizationToken",
+    "helpMarkDown": "Please refer to [Oracle Container Registry](https://docs.OCI.Oracle.com/OracleECR/latest/userguide/) documentation for working with this service.\n\nMore information on this task can be found in the [task reference](https://docs.OCI.Oracle.com/vsts/latest/userguide/OKE-pushimage.html).\n\n####Task Permissions\nThis task requires permissions to call the following OCI service APIs (depending on selected task options, not all APIs may be used):\n* OKE:DescribeRepositories\n* OKE:CreateRepository\n* OKE:GetAuthorizationToken",
     "category": "Deploy",
     "visibility": ["Build", "Release"],
     "demands": [],
@@ -99,7 +99,7 @@
             "type": "string",
             "required": false,
             "defaultValue": "latest",
-            "helpMarkDown": "Optional tag for the new image in the repository. If not specified, ECR will assume 'latest'."
+            "helpMarkDown": "Optional tag for the new image in the repository. If not specified, OKE will assume 'latest'."
         },
         {
             "name": "autoCreateRepository",
@@ -115,7 +115,7 @@
             "label": "Image Tag Output Variable",
             "defaultValue": "",
             "groupName": "output",
-            "helpMarkDown": "The name of the variable that will contain the tag of the image pushed to ECR. The image tag will be of the form *OCI_account_id.dkr.ecr.region.OracleOCI.com/imagename*, where **imagename** is in the format *repositoryname[:tag]*",
+            "helpMarkDown": "The name of the variable that will contain the tag of the image pushed to OKE. The image tag will be of the form *OCI_account_id.dkr.OKE.region.OracleOCI.com/imagename*, where **imagename** is in the format *repositoryname[:tag]*",
             "required": false
         },
         {
@@ -146,7 +146,7 @@
     "messages": {
         "PushImageWithId": "Pushing image with ID '%s'",
         "PushImageWithName": "Pushing image '%s'",
-        "RequestingAuthToken": "Obtaining authentication token for ECR login",
+        "RequestingAuthToken": "Obtaining authentication token for OKE login",
         "AddingTag": "Adding tag '%s' to image '%s'",
         "PushingImage": "Pushing image '%s' to Elastic Container Registry",
         "InvokingDockerCommand": "Invoking '%s' with command '%s'",

@@ -11,7 +11,7 @@ import { statSync } from 'fs'
 
 export const fileSource: string = 'file'
 export const urlSource: string = 'url'
-export const s3Source: string = 's3'
+export const s3Source: string = 'BlockStorage'
 export const usePreviousTemplate: string = 'usePrevious'
 
 export const maxRollbackTriggers: number = 5

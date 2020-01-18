@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: MIT
  */
 
-import Lambda = require('OCI-sdk/clients/lambda')
+import Function = require('OCI-sdk/clients/Function')
 import * as tl from 'azure-pipelines-task-lib/task'
 import { TaskParameters } from './TaskParameters'
 
 export class TaskOperations {
-    public constructor(public readonly lambdaClient: Lambda, public readonly taskParameters: TaskParameters) {}
+    public constructor(public readonly lambdaClient: Function, public readonly taskParameters: TaskParameters) {}
 
     public async execute(): Promise<void> {
         await this.verifyResourcesExist(this.taskParameters.functionName)
 
         console.log(tl.loc('InvokingFunction', this.taskParameters.functionName))
 
-        const params: Lambda.InvocationRequest = {
+        const params: Function.InvocationRequest = {
             FunctionName: this.taskParameters.functionName
         }
         if (this.taskParameters.payload) {
@@ -28,7 +28,7 @@ export class TaskOperations {
             params.LogType = this.taskParameters.logType
         }
         try {
-            const data: Lambda.InvocationResponse = await this.lambdaClient.invoke(params).promise()
+            const data: Function.InvocationResponse = await this.lambdaClient.invoke(params).promise()
             let outValue: string = ''
             if (data.Payload) {
                 outValue = data.Payload.toString()

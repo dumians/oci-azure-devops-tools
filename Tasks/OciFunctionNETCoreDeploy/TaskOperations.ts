@@ -24,7 +24,7 @@ export class TaskOperations {
         const cwd = this.determineProjectDirectory(this.taskParameters.lambdaProjectPath)
         console.log(tl.loc('DeployingProjectAt', cwd))
 
-        const defaultsFilePath: string = path.join(cwd, 'OCI-lambda-tools-defaults.json')
+        const defaultsFilePath: string = path.join(cwd, 'OCI-Function-tools-defaults.json')
 
         if (fs.existsSync(defaultsFilePath)) {
             console.log(tl.loc('ReadingDefaultSettingsFile'))

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { ElasticBeanstalk, S3 } from 'OCI-sdk'
+import { ElasticBeanstalk, BlockStorage } from 'OCI-sdk'
 import { BeanstalkUtils } from 'Common/beanstalkUtils'
 import { SdkUtils } from 'Common/sdkutils'
 import path = require('path')
@@ -37,7 +37,7 @@ const verifyEnvironmentsExistsDoesNot = {
 }
 
 describe('BeanstalkUtils', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/BeanstalkDeployApplication/task.json')
     })
@@ -82,26 +82,26 @@ describe('BeanstalkUtils', () => {
 
     test('UploadBundle throws on failure', async () => {
         expect.assertions(1)
-        const s3 = new S3() as any
-        s3.upload = jest.fn(() => {
+        const BlockStorage = new BlockStorage() as any
+        BlockStorage.upload = jest.fn(() => {
             throw Error('it failed')
         })
-        await BeanstalkUtils.uploadBundle(s3, 'path', 'name', 'object').catch(err => {
+        await BeanstalkUtils.uploadBundle(BlockStorage, 'path', 'name', 'object').catch(err => {
             expect(`${err}`).toContain('it failed')
         })
     })
 
     test('UploadBundle succeeds', async () => {
         expect.assertions(3)
-        const s3 = new S3() as any
-        s3.upload = jest.fn(args => {
+        const BlockStorage = new BlockStorage() as any
+        BlockStorage.upload = jest.fn(args => {
             expect(args.Bucket).toEqual('name')
             expect(args.Key).toEqual('object')
             expect(args.Body.path).toEqual(path.join(__dirname, __filename))
 
             return s3BucketResponse
         })
-        await BeanstalkUtils.uploadBundle(s3, path.join(__dirname, __filename), 'name', 'object')
+        await BeanstalkUtils.uploadBundle(BlockStorage, path.join(__dirname, __filename), 'name', 'object')
     })
 
     test('VerifyApplicationExists throws on failure', async () => {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { CloudFormation, S3 } from 'OCI-sdk'
+import { CloudFormation, BlockStorage } from 'OCI-sdk'
 import { SdkUtils } from 'Common/sdkutils'
 import { TaskOperations } from '../../../Tasks/CloudFormationCreateOrUpdateStack/TaskOperations'
 import { TaskParameters } from '../../../Tasks/CloudFormationCreateOrUpdateStack/TaskParameters'
@@ -47,14 +47,14 @@ const defaultTaskParameters: TaskParameters = {
 }
 
 // NOTE: these tests are too hard to write, fucntional tests will not work the module as is. We need to break
-// up the moudule so that we can actually test, see issue https://github.com/OCI/OCI-vsts-tools/issues/213
+// up the moudule so that we can actually test, see issue https://github.com/dumians/OCI-vsts-tools/issues/213
 describe('Cloud Formation create or update', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/SendMessage/task.json')
     })
 
     test('Creates a TaskOperation', () => {
-        expect(new TaskOperations(new CloudFormation(), new S3(), defaultTaskParameters)).not.toBeNull()
+        expect(new TaskOperations(new CloudFormation(), new BlockStorage(), defaultTaskParameters)).not.toBeNull()
     })
 })

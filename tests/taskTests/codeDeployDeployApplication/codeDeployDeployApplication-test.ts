@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { CodeDeploy, S3 } from 'OCI-sdk'
+import { CodeDeploy, BlockStorage } from 'OCI-sdk'
 import { SdkUtils } from 'Common/sdkutils'
 import fs = require('fs')
 import path = require('path')
@@ -45,18 +45,18 @@ const codeDeployDeploymentId = {
 }
 
 describe('CodeDeploy Deploy Application', () => {
-    // TODO https://github.com/OCI/OCI-vsts-tools/issues/167
+    // TODO https://github.com/dumians/OCI-vsts-tools/issues/167
     beforeAll(() => {
         SdkUtils.readResourcesFromRelativePath('../../_build/Tasks/CodeDeployDeployApplication/task.json')
     })
 
     test('Creates a TaskOperation', () => {
-        expect(new TaskOperations(new CodeDeploy(), new S3(), defaultTaskParameters)).not.toBeNull()
+        expect(new TaskOperations(new CodeDeploy(), new BlockStorage(), defaultTaskParameters)).not.toBeNull()
     })
 
     test('Verify resources exists fails, fails task', async () => {
         expect.assertions(1)
-        const taskOperations = new TaskOperations(new CodeDeploy(), new S3(), defaultTaskParameters)
+        const taskOperations = new TaskOperations(new CodeDeploy(), new BlockStorage(), defaultTaskParameters)
         await taskOperations.execute().catch(err => {
             expect(`${err}`).toContain('Application undefined does not exist')
         })
@@ -66,20 +66,20 @@ describe('CodeDeploy Deploy Application', () => {
         expect.assertions(1)
         const codeDeploy = new CodeDeploy() as any
         codeDeploy.getApplication = jest.fn(() => emptyPromise)
-        const taskOperations = new TaskOperations(codeDeploy, new S3(), defaultTaskParameters)
+        const taskOperations = new TaskOperations(codeDeploy, new BlockStorage(), defaultTaskParameters)
         await taskOperations.execute().catch(err => {
             expect(`${err}`).toContain('Deployment group undefined does not exist')
         })
     })
 
-    test('Verify s3 bucket exists fails, fails task', async () => {
+    test('Verify BlockStorage bucket exists fails, fails task', async () => {
         expect.assertions(1)
         const taskParameters = { ...defaultTaskParameters }
         taskParameters.deploymentRevisionSource = revisionSourceFromS3
         const codeDeploy = new CodeDeploy() as any
         codeDeploy.getApplication = jest.fn(() => emptyPromise)
         codeDeploy.getDeploymentGroup = jest.fn(() => emptyPromise)
-        const taskOperations = new TaskOperations(codeDeploy, new S3(), taskParameters)
+        const taskOperations = new TaskOperations(codeDeploy, new BlockStorage(), taskParameters)
         await taskOperations.execute().catch(err => {
             expect(`${err}`).toContain('Archive with key undefined does not exist')
         })
@@ -96,9 +96,9 @@ describe('CodeDeploy Deploy Application', () => {
         codeDeploy.createDeployment = jest.fn(() => codeDeployDeploymentId)
         // the first argument of the callback is error so pass in an "error"
         codeDeploy.waitFor = jest.fn((arr1, arr2, cb) => cb(new Error('22'), undefined))
-        const s3 = new S3() as any
-        s3.headObject = jest.fn(() => emptyPromise)
-        const taskOperations = new TaskOperations(codeDeploy, s3, taskParameters)
+        const BlockStorage = new BlockStorage() as any
+        BlockStorage.headObject = jest.fn(() => emptyPromise)
+        const taskOperations = new TaskOperations(codeDeploy, BlockStorage, taskParameters)
         await taskOperations.execute().catch(err => {
             expect(`${err}`).toContain('Error: Deployment failed undefined 22')
         })
@@ -111,8 +111,8 @@ describe('CodeDeploy Deploy Application', () => {
         taskParameters.deploymentRevisionSource = revisionSourceFromWorkspace
         taskParameters.revisionBundle = path.join(__dirname, '../../resources/codeDeployCode')
         taskParameters.applicationName = 'test'
-        const s3 = new S3() as any
-        s3.upload = jest.fn(args => {
+        const BlockStorage = new BlockStorage() as any
+        BlockStorage.upload = jest.fn(args => {
             expect(args.Bucket).toBe('')
             expect(args.Key).toContain('test.v')
             const dir = fs.readdirSync(__dirname)
@@ -136,7 +136,7 @@ describe('CodeDeploy Deploy Application', () => {
 
             return { promise: () => undefined }
         })
-        const taskOperations = new TaskOperations(codeDeploy, s3, taskParameters)
+        const taskOperations = new TaskOperations(codeDeploy, BlockStorage, taskParameters)
         await taskOperations.execute()
     })
 
@@ -145,8 +145,8 @@ describe('CodeDeploy Deploy Application', () => {
         taskParameters.deploymentRevisionSource = revisionSourceFromS3
         taskParameters.applicationName = 'test'
         taskParameters.bundleKey = path.join(__dirname, '../../resources/codeDeployCode.zip')
-        const s3 = new S3() as any
-        s3.headObject = jest.fn(() => emptyPromise)
+        const BlockStorage = new BlockStorage() as any
+        BlockStorage.headObject = jest.fn(() => emptyPromise)
         const codeDeploy = new CodeDeploy() as any
         codeDeploy.getApplication = jest.fn(() => emptyPromise)
         codeDeploy.getDeploymentGroup = jest.fn(() => emptyPromise)
@@ -156,7 +156,7 @@ describe('CodeDeploy Deploy Application', () => {
 
             return { promise: () => undefined }
         })
-        const taskOperations = new TaskOperations(codeDeploy, s3, taskParameters)
+        const taskOperations = new TaskOperations(codeDeploy, BlockStorage, taskParameters)
         await taskOperations.execute()
     })
 })

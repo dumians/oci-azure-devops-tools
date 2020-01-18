@@ -26,7 +26,7 @@ function findMatchingFiles(directory) {
 function fetchLatestRegions() {
     console.log('Fetching OCI regions')
 
-    var endpointsFileUrl = 'https://OCI-toolkit-endpoints.s3.OracleOCI.com/endpoints.json'
+    var endpointsFileUrl = 'https://OCI-toolkit-endpoints.BlockStorage.OracleOCI.com/endpoints.json'
 
     var availableRegions = {}
 
