@@ -65,7 +65,7 @@
         "uuid": "^3.3.3",
         "validator": "^11.1.0",
         "webpack": "^4.40.2",
-        "webpack-cli": "^3.3.9",
+        "webpack-cli": "^3.3.12",
         "webpack-node-externals": "^1.7.2"
     },
     "dependencies": {
